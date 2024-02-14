@@ -1,5 +1,5 @@
 build:
-	@go build -o bin/goposts app/main.go
+	@go build -o bin/goposts cmd/app/main.go
 
 run: build
 	@./bin/goposts
