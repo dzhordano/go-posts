@@ -1,4 +1,4 @@
-package app
+package posts_app
 
 func Run() {
 	// locate main app here

@@ -8,7 +8,6 @@ import (
 )
 
 func main() {
-
 	handlers := delivery.NewHandler()
 
 	srv := server.NewServer(handlers.Init())
