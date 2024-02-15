@@ -1,1 +1,5 @@
 env: "prod"
+http-server:
+  port: "8081"
+  timeout: 10s
+  idle_timeout: 120s

@@ -19,3 +19,14 @@ type User struct {
 	RegisteredAt time.Time `json:"registered_at"`
 	LastOnline   time.Time `json:"last_online"`
 }
+
+type UserSignUpInput struct {
+	Name     string
+	Email    string
+	Password string
+}
+
+type UserSignInInput struct {
+	Email    string
+	Password string
+}

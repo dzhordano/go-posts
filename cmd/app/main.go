@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/dzhordano/go-posts/internal/common/server"
 	delivery "github.com/dzhordano/go-posts/internal/delivery/http"
+	"github.com/dzhordano/go-posts/pkg/server"
 )
 
 func main() {

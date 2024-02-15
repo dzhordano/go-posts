@@ -18,10 +18,15 @@ type Post struct {
 }
 
 type Comment struct {
-	ID          uint
-	UserName    string
-	Data        string
-	CommentedAt string
-	UpdatedAt   string
-	Censored    bool
+	ID          uint   `json:"id"`
+	UserName    string `json:"username"`
+	Data        string `json:"data"`
+	CommentedAt string `json:"commented_at"`
+	UpdatedAt   string `json:"updated_at"`
+	Censored    bool   `json:"censored"`
+}
+
+type UpdatePostInput struct {
+	Title       *string
+	Description *string
 }
