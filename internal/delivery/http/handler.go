@@ -3,15 +3,18 @@ package http
 import (
 	"net/http"
 
+	"github.com/dzhordano/go-posts/internal/service"
 	"github.com/gin-gonic/gin"
 )
 
 type Handler struct {
-	// empeti
+	services *service.Services
 }
 
-func NewHandler() *Handler {
-	return &Handler{}
+func NewHandler(services *service.Services) *Handler {
+	return &Handler{
+		services: services,
+	}
 }
 
 func (h *Handler) Init() *gin.Engine {

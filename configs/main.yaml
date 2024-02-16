@@ -1,0 +1,9 @@
+http:
+  host: "localhost"
+  port: "8081"
+  timeout: 10s
+  idle_timeout: 120s
+
+postgres:
+  dbname: postgres
+  sslmode: disable

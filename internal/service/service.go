@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/dzhordano/go-posts/internal/domain"
+	"github.com/dzhordano/go-posts/internal/repository"
 )
 
 type Users interface {
@@ -29,6 +30,11 @@ type Services struct {
 	Posts  Posts
 }
 
-func NewService() *Services {
+// services dependencies
+type Deps struct {
+	Repos *repository.Repos
+}
+
+func NewService(deps Deps) *Services {
 	return &Services{}
 }

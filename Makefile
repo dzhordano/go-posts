@@ -6,7 +6,7 @@ run: build
 
 # CREATE TABLES
 up:
-	@migrate -path ./schema -database 'postgres://postgres:qwerty@localhost:5431/postgres?sslmode=disable' up
+	@migrate -path ./migrations -database 'postgres://postgres:qwerty@localhost:5433/postgres?sslmode=disable' up
 # DROP TABLES
 down:
-	@migrate -path ./schema -database 'postgres://postgres:qwerty@localhost:5431/postgres?sslmode=disable' down`
+	@migrate -path ./migrations -database 'postgres://postgres:qwerty@localhost:5433/postgres?sslmode=disable' down
