@@ -3,20 +3,21 @@ package server
 import (
 	"context"
 	"net/http"
-	"time"
+
+	"github.com/dzhordano/go-posts/internal/common/config"
 )
 
 type Server struct {
 	httpServer *http.Server
 }
 
-func NewServer(handler http.Handler) *Server {
+func NewServer(cfg *config.Config, handler http.Handler) *Server {
 	return &Server{
 		httpServer: &http.Server{
-			Addr:           ":8000",
+			Addr:           ":" + cfg.HTTP.Port,
 			Handler:        handler,
-			ReadTimeout:    10 * time.Second,
-			WriteTimeout:   10 * time.Second,
+			ReadTimeout:    cfg.HTTP.Timeout,
+			WriteTimeout:   cfg.HTTP.Timeout,
 			MaxHeaderBytes: 1 << 20,
 		},
 	}

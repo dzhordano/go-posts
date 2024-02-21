@@ -7,6 +7,10 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+const (
+	users_table = "users"
+)
+
 type (
 	Users interface {
 		Create(ctx context.Context, user domain.User) error
@@ -33,5 +37,7 @@ type Repos struct {
 }
 
 func NewRepos(db *pgxpool.Pool) *Repos {
-	return &Repos{}
+	return &Repos{
+		Users: NewUsersRepo(db),
+	}
 }

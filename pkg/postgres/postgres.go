@@ -37,16 +37,12 @@ func NewClient(ctx context.Context, dc DBConfig) (pool *pgxpool.Pool, err error)
 		fmt.Fprintf(os.Stderr, "Unable to create connection pool: %v\n", err)
 		os.Exit(1)
 	}
-	defer dbpool.Close()
 
-	var greeting string
-	err = dbpool.QueryRow(context.Background(), "select 'Hello, world!'").Scan(&greeting)
+	err = dbpool.Ping(ctx)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "QueryRow failed: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Ping failed: %v\n", err)
 		os.Exit(1)
 	}
-
-	fmt.Println(greeting)
 
 	return dbpool, nil
 }

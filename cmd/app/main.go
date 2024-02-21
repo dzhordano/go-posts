@@ -14,8 +14,6 @@ import (
 
 var cfgPath = "configs"
 
-// TODO: AUTH with HMAC (later consider upgrading to RSA (remember about tls 1.3. constraint, or tiffy helmet))
-
 func main() {
 	cfg, err := config.MustLoad(cfgPath)
 	if err != nil {
@@ -48,7 +46,7 @@ func main() {
 	handlers := delivery.NewHandler(services)
 
 	// Init server
-	srv := server.NewServer(handlers.Init())
+	srv := server.NewServer(cfg, handlers.Init())
 
 	// Run server
 	if err := srv.Run(); err != nil {
