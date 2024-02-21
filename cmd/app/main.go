@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"context"
 	"log"
 
 	"github.com/dzhordano/go-posts/internal/common/config"
@@ -10,27 +10,34 @@ import (
 	"github.com/dzhordano/go-posts/internal/service"
 	"github.com/dzhordano/go-posts/pkg/postgres"
 	"github.com/dzhordano/go-posts/pkg/server"
-	_ "github.com/lib/pq"
 )
 
 var cfgPath = "configs"
 
-func main() {
+// TODO: AUTH with HMAC (later consider upgrading to RSA (remember about tls 1.3. constraint, or tiffy helmet))
 
+func main() {
 	cfg, err := config.MustLoad(cfgPath)
 	if err != nil {
 		log.Fatal("error initializing config")
 	}
 
-	fmt.Printf("%s %s %s %s %s %s", cfg.PG.Host, cfg.PG.Port, cfg.PG.DBName, cfg.PG.Username, cfg.PG.Password, cfg.PG.SSLMode)
+	pgclient, err := postgres.NewClient(context.Background(), postgres.DBConfig{
+		Username: cfg.PG.Username,
+		Password: cfg.PG.Password,
+		Host:     cfg.PG.Host,
+		Port:     cfg.PG.Port,
+		Database: cfg.PG.DBName,
+		SSLMode:  cfg.PG.SSLMode,
+		MaxAtts:  5,
+	})
 
-	db, err := postgres.NewClient(cfg.PG.Host, cfg.PG.Port, cfg.PG.DBName, cfg.PG.Username, cfg.PG.Password, cfg.PG.SSLMode)
 	if err != nil {
 		log.Fatalf("failed to init db: %v", err)
 	}
 
 	// Init repositories
-	repos := repository.NewRepos(db)
+	repos := repository.NewRepos(pgclient)
 
 	// Init services
 	services := service.NewService(service.Deps{

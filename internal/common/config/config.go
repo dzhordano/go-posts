@@ -26,9 +26,9 @@ type (
 		Host     string
 		Port     string
 		DBName   string
-		SSLMode  string
 		Username string
 		Password string
+		SSLMode  string
 	}
 )
 

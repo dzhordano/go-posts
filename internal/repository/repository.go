@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/dzhordano/go-posts/internal/domain"
-	"github.com/jmoiron/sqlx"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type (
@@ -32,6 +32,6 @@ type Repos struct {
 	Posts  Posts
 }
 
-func NewRepos(db *sqlx.DB) *Repos {
+func NewRepos(db *pgxpool.Pool) *Repos {
 	return &Repos{}
 }
