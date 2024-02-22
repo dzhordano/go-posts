@@ -25,11 +25,25 @@ func (h *Handler) userSignUp(c *gin.Context) {
 
 	if err := h.services.Users.SignUP(c, input); err != nil {
 		c.JSON(http.StatusInternalServerError, err)
+		return
 	}
 
 	c.Status(http.StatusCreated)
 }
 
 func (h *Handler) userSignIn(c *gin.Context) {
-	c.Status(http.StatusNoContent)
+	var input domain.UserSignInInput
+
+	if err := c.BindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	id, err := h.services.Users.SignIN(c, input)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, id)
 }

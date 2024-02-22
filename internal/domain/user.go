@@ -7,19 +7,20 @@ import (
 )
 
 type User struct {
-	ID           uuid.UUID `json:"id"`
+	ID           int       `json:"id"`
+	UID          uuid.UUID `json:"uid"`
 	Name         string    `json:"name" binding:"required"`
 	Email        string    `json:"email" binding:"required"`
 	Password     string    `json:"password"  binding:"required"`
-	Verification `json:"verification"`
+	Verification `json:"verification" db:"verification"`
 	Suspended    bool      `json:"suspended"`
-	RegisteredAt time.Time `json:"registered_at"`
-	LastOnline   time.Time `json:"last_online"`
+	RegisteredAt time.Time `json:"registered_at"  db:"registered"`
+	LastOnline   time.Time `json:"last_online"  db:"lastonline"`
 }
 
 type Verification struct {
-	Code       string `json:"verification_code"`
-	IsVerified bool   `json:"verificatio_verified"`
+	Code     string `json:"verification_code"`
+	Verified bool   `json:"verificatio_verified"`
 }
 
 type UserSignUpInput struct {

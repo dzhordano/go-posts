@@ -5,11 +5,13 @@ import (
 
 	"github.com/dzhordano/go-posts/internal/domain"
 	"github.com/dzhordano/go-posts/internal/repository"
+	"github.com/google/uuid"
 )
 
 type Users interface {
 	SignUP(ctx context.Context, input domain.UserSignUpInput) error
-	SignIN(ctx context.Context, input domain.UserSignInInput) error
+	// TODO: change to tokens return after, not uuid
+	SignIN(ctx context.Context, input domain.UserSignInInput) (uuid.UUID, error)
 }
 
 type Admins interface {

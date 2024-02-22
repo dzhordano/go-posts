@@ -35,6 +35,7 @@ func main() {
 	}
 
 	// Init repositories
+	// TODO: dont forget to put pgxpool.Close() after graceful shutdown or somwhere where it belongs
 	repos := repository.NewRepos(pgclient)
 
 	// Init services

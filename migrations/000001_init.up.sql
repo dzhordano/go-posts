@@ -5,6 +5,7 @@ CREATE TYPE verification_type AS (
 
 CREATE TABLE IF NOT EXISTS admins (
     id SERIAL PRIMARY KEY,
+    uid uuid DEFAULT gen_random_uuid(),
     name TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL,
@@ -14,6 +15,7 @@ CREATE TABLE IF NOT EXISTS admins (
 
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
+    uid uuid DEFAULT gen_random_uuid(),
     name TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL,
