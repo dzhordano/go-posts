@@ -5,16 +5,19 @@ import (
 
 	v1 "github.com/dzhordano/go-posts/internal/delivery/http/v1"
 	"github.com/dzhordano/go-posts/internal/service"
+	"github.com/dzhordano/go-posts/pkg/auth"
 	"github.com/gin-gonic/gin"
 )
 
 type Handler struct {
-	services *service.Services
+	services     *service.Services
+	tokenManager auth.TokenManager
 }
 
-func NewHandler(services *service.Services) *Handler {
+func NewHandler(services *service.Services, tokenManager auth.TokenManager) *Handler {
 	return &Handler{
-		services: services,
+		services:     services,
+		tokenManager: tokenManager,
 	}
 }
 
@@ -31,7 +34,7 @@ func (h *Handler) Init() *gin.Engine {
 }
 
 func (h *Handler) initApi(router *gin.Engine) {
-	v1 := v1.NewHandler(h.services)
+	v1 := v1.NewHandler(h.services, h.tokenManager)
 	api := router.Group("/api")
 	{
 		v1.Init(api)

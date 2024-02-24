@@ -12,8 +12,20 @@ import (
 type (
 	Config struct {
 		Env  string `yaml:"env" env-default:"local"`
+		AUTH AUTHConfig
 		HTTP HTTPConfig
 		PG   PGConfig
+	}
+
+	AUTHConfig struct {
+		JWT          JWTConfig
+		PasswordSalt string
+	}
+
+	JWTConfig struct {
+		AccessTokenTTL  time.Duration `mapstructure:"accessTokenTTL"`
+		RefreshTokenTTL time.Duration `mapstructure:"refreshTokenTTL"`
+		SigningKey      string
 	}
 
 	HTTPConfig struct {
@@ -64,11 +76,18 @@ func unmarshalVals(cfg *Config) error {
 		return err
 	}
 
+	if err := viper.UnmarshalKey("auth", &cfg.AUTH.JWT); err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func setFromEnv(cfg *Config) {
 	cfg.Env = os.Getenv("APP_ENV")
+
+	cfg.AUTH.PasswordSalt = os.Getenv("PASSWORD_SALT")
+	cfg.AUTH.JWT.SigningKey = os.Getenv("SIGNING_KEY")
 
 	cfg.PG.Host = os.Getenv("PG_HOST")
 	cfg.PG.Port = os.Getenv("PG_PORT")

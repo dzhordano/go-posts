@@ -8,6 +8,8 @@ import (
 	delivery "github.com/dzhordano/go-posts/internal/delivery/http"
 	"github.com/dzhordano/go-posts/internal/repository"
 	"github.com/dzhordano/go-posts/internal/service"
+	"github.com/dzhordano/go-posts/pkg/auth"
+	"github.com/dzhordano/go-posts/pkg/hasher"
 	"github.com/dzhordano/go-posts/pkg/postgres"
 	"github.com/dzhordano/go-posts/pkg/server"
 )
@@ -19,6 +21,13 @@ func main() {
 	if err != nil {
 		log.Fatal("error initializing config")
 	}
+
+	tokenManager, err := auth.NewManager(cfg.AUTH.JWT.SigningKey)
+	if err != nil {
+		log.Fatalf("failed on: %v", err)
+	}
+
+	hasher := hasher.NewSHA256Hasher(cfg.AUTH.PasswordSalt)
 
 	pgclient, err := postgres.NewClient(context.Background(), postgres.DBConfig{
 		Username: cfg.PG.Username,
@@ -35,16 +44,21 @@ func main() {
 	}
 
 	// Init repositories
-	// TODO: dont forget to put pgxpool.Close() after graceful shutdown or somwhere where it belongs
+	// TODO: dont forget to put pgxpool.Close() after graceful shutdown or somewhere where it belongs
 	repos := repository.NewRepos(pgclient)
 
 	// Init services
 	services := service.NewService(service.Deps{
-		Repos: repos,
+		Repos:        repos,
+		Hasher:       hasher,
+		TokenManager: tokenManager,
+
+		AccessTokenTTL:  cfg.AUTH.JWT.AccessTokenTTL,
+		RefreshTokenTTL: cfg.AUTH.JWT.RefreshTokenTTL,
 	})
 
 	// Init handlers
-	handlers := delivery.NewHandler(services)
+	handlers := delivery.NewHandler(services, tokenManager)
 
 	// Init server
 	srv := server.NewServer(cfg, handlers.Init())

@@ -1,6 +1,8 @@
 package utils
 
-import "time"
+import (
+	"time"
+)
 
 func DoWithTries(fn func() error, atts int, delay time.Duration) (err error) {
 	for atts < 0 {

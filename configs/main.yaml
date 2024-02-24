@@ -7,3 +7,7 @@ http:
 postgres:
   dbname: postgres
   sslmode: disable
+
+auth:
+  accessTokenTTL: 12h
+  refreshTokenTTL: 720h #30 days

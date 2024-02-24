@@ -3,6 +3,11 @@ CREATE TYPE verification_type AS (
     verified BOOLEAN
 );
 
+CREATE TYPE session_type AS (
+    rtoken TEXT,
+    expiresat TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS admins (
     id SERIAL PRIMARY KEY,
     uid uuid DEFAULT gen_random_uuid(),
@@ -20,6 +25,7 @@ CREATE TABLE IF NOT EXISTS users (
     email TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL,
     verification verification_type,
+    session session_type,
     suspended BOOLEAN DEFAULT FALSE,
     registered TIMESTAMP WITHOUT TIME ZONE,
     lastonline TIMESTAMP WITHOUT TIME ZONE

@@ -30,7 +30,7 @@ type Client interface {
 }
 
 func NewClient(ctx context.Context, dc DBConfig) (pool *pgxpool.Pool, err error) {
-	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s", dc.Username, dc.Password, dc.Host, dc.Port, dc.Database, dc.SSLMode)
+	dsn := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=%s", dc.Username, dc.Password, dc.Host, dc.Port, dc.Database, dc.SSLMode)
 
 	dbpool, err := pgxpool.New(context.Background(), dsn)
 	if err != nil {
