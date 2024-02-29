@@ -38,7 +38,6 @@ func main() {
 		SSLMode:  cfg.PG.SSLMode,
 		MaxAtts:  5,
 	})
-
 	if err != nil {
 		log.Fatalf("failed to init db: %v", err)
 	}

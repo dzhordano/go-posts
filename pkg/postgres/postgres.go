@@ -30,19 +30,19 @@ type Client interface {
 }
 
 func NewClient(ctx context.Context, dc DBConfig) (pool *pgxpool.Pool, err error) {
-	dsn := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=%s", dc.Username, dc.Password, dc.Host, dc.Port, dc.Database, dc.SSLMode)
+	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s", dc.Username, dc.Password, dc.Host, dc.Port, dc.Database, dc.SSLMode)
 
-	dbpool, err := pgxpool.New(context.Background(), dsn)
+	pool, err = pgxpool.New(context.Background(), dsn)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to create connection pool: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
 		os.Exit(1)
 	}
 
-	err = dbpool.Ping(ctx)
+	err = pool.Ping(ctx)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Ping failed: %v\n", err)
 		os.Exit(1)
 	}
 
-	return dbpool, nil
+	return pool, nil
 }
