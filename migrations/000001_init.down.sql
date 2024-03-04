@@ -13,3 +13,5 @@ DROP TABLE IF EXISTS admins;
 DROP TABLE IF EXISTS users;
 
 DROP TYPE IF EXISTS verification_type;
+
+DROP TYPE IF EXISTS session_type;

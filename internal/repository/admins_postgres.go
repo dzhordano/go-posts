@@ -19,12 +19,12 @@ func NewAdminsRepo(db *pgxpool.Pool) *AdminsRepo {
 	}
 }
 
-func (r *AdminsRepo) GetById(ctx context.Context, userId int) (domain.User, error) {
+func (r *AdminsRepo) GetById(ctx context.Context, userId uint) (domain.User, error) {
 	panic("todo")
 }
 
 func (r *AdminsRepo) GetByCredentials(ctx context.Context, input domain.UserSignInInput) (domain.User, error) {
-	query := fmt.Sprintf("SELECT id, uid, name, email, password, registered, lastonline FROM %s WHERE email = $1 AND password = $2", admins_table)
+	query := fmt.Sprintf("SELECT id, name, email, password, registered, lastonline FROM %s WHERE email = $1 AND password = $2", admins_table)
 	rows, err := r.db.Query(ctx, query, input.Email, input.Password)
 	if err != nil {
 		return domain.User{}, err

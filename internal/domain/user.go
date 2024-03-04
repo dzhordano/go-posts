@@ -2,17 +2,15 @@ package domain
 
 import (
 	"time"
-
-	"github.com/google/uuid"
 )
 
 type User struct {
-	ID           int       `json:"id"`
-	UID          uuid.UUID `json:"uid"`
-	Name         string    `json:"name" binding:"required"`
-	Email        string    `json:"email" binding:"required"`
-	Password     string    `json:"password"  binding:"required"`
+	ID           uint   `json:"id"`
+	Name         string `json:"name" binding:"required"`
+	Email        string `json:"email" binding:"required"`
+	Password     string `json:"password"  binding:"required"`
 	Verification `json:"verification" db:"verification"`
+	Session      `json:"session"`
 	Suspended    bool      `json:"suspended"`
 	RegisteredAt time.Time `json:"registered_at"  db:"registered"`
 	LastOnline   time.Time `json:"last_online"  db:"lastonline"`

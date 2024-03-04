@@ -10,7 +10,6 @@ CREATE TYPE session_type AS (
 
 CREATE TABLE IF NOT EXISTS admins (
     id SERIAL PRIMARY KEY,
-    uid uuid DEFAULT gen_random_uuid(),
     name TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL,
@@ -20,7 +19,6 @@ CREATE TABLE IF NOT EXISTS admins (
 
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
-    uid uuid DEFAULT gen_random_uuid(),
     name TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL,
@@ -36,7 +34,10 @@ CREATE TABLE IF NOT EXISTS posts (
     title TEXT NOT NULL,
     description TEXT,
     suspended BOOLEAN DEFAULT FALSE,
-    created TIMESTAMP WITHOUT TIME ZONE
+    created TIMESTAMP WITHOUT TIME ZONE,
+    updated TIMESTAMP WITHOUT TIME ZONE,
+    likes INTEGER DEFAULT 0,
+    watched INTEGER DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS comments (

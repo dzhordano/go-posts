@@ -16,14 +16,17 @@ type UsersService struct {
 	hasher      hasher.PassworsHasher
 	tokenManger auth.TokenManager
 
+	postsService Posts
+
 	accessTokenTLL  time.Duration
 	refreshTokenTLL time.Duration
 }
 
-func NewUsersService(repo repository.Users, hasher hasher.PassworsHasher, tokenManager auth.TokenManager, attl, rttl time.Duration) *UsersService {
+func NewUsersService(repo repository.Users, hasher hasher.PassworsHasher, tokenManager auth.TokenManager, postsService Posts, attl, rttl time.Duration) *UsersService {
 	return &UsersService{
 		repo:            repo,
 		hasher:          hasher,
+		postsService:    postsService,
 		tokenManger:     tokenManager,
 		accessTokenTLL:  attl,
 		refreshTokenTLL: rttl,
@@ -62,14 +65,13 @@ func (s *UsersService) SignIN(ctx context.Context, input domain.UserSignInInput)
 
 	user, err := s.repo.GetByCredentials(ctx, input)
 	if err != nil {
-		fmt.Println(err)
 		return Tokens{}, err
 	}
 
 	return s.createSession(ctx, user.ID)
 }
 
-func (s *UsersService) createSession(ctx context.Context, userId int) (res Tokens, err error) {
+func (s *UsersService) createSession(ctx context.Context, userId uint) (res Tokens, err error) {
 
 	res.AccessToken, err = s.tokenManger.CreateJWT(fmt.Sprintf("%x", userId), s.accessTokenTLL)
 	if err != nil {

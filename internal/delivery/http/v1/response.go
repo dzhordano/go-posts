@@ -4,6 +4,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type dataResponse struct {
+	Data interface{} `json:"data"`
+}
+
 type response struct {
 	Message string `json:"message"`
 }

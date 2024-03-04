@@ -2,19 +2,17 @@ package domain
 
 import (
 	"time"
-
-	"github.com/google/uuid"
 )
 
 type Post struct {
-	ID          uuid.UUID `json:"uuid"`
-	Title       string    `json:"title"`
-	Description string    `json:"description"`
-	CreatedAt   time.Time `json:"createdAt"`
-	UpdatedAt   time.Time `json:"updatedAt"`
+	ID          uint      `json:"id"`
+	Title       string    `json:"title" binding:"required"`
+	Description string    `json:"description"  binding:"required"`
+	Suspended   bool      `json:"suspended"`
+	CreatedAt   time.Time `json:"createdAt" db:"created"`
+	UpdatedAt   time.Time `json:"updatedAt" db:"updated"`
 	Likes       uint      `json:"likes"`
 	Watched     uint      `json:"watched"`
-	Comment     Comment   `json:"comment"`
 }
 
 type Comment struct {

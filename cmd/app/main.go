@@ -16,6 +16,8 @@ import (
 
 var cfgPath = "configs"
 
+// TODO: зач в структуре нужны поля типо сессии если я их не использую да и не сохраняю туда данные (чет я тупеньки)
+
 func main() {
 	cfg, err := config.MustLoad(cfgPath)
 	if err != nil {

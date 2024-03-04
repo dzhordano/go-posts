@@ -2,6 +2,7 @@ package v1
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/dzhordano/go-posts/internal/domain"
 	"github.com/gin-gonic/gin"
@@ -16,8 +17,17 @@ func (h *Handler) initUsersRoutes(api *gin.RouterGroup) {
 
 		auth := users.Group("/", h.userIdentity)
 		{
-			auth.GET("/test", func(c *gin.Context) { c.JSON(http.StatusOK, "Hello, world!") })
-			// posts := auth.Group("/posts")
+			// TODO: remove this
+			auth.GET("/test", func(c *gin.Context) { c.JSON(http.StatusOK, "auth works!") })
+			posts := auth.Group("/posts")
+			{
+				posts.GET("/", h.getUserPosts)
+				posts.POST("/", h.createUserPost)
+				posts.GET("/:id", h.getUserPostById)
+				// not implemented ---
+				posts.PUT("/:id", h.updateUserPost)
+				posts.DELETE("/:id", h.deleteUserPost)
+			}
 		}
 	}
 }
@@ -85,4 +95,78 @@ func (h *Handler) userRefresh(c *gin.Context) {
 		AccessToken:  res.AccessToken,
 		RefreshToken: res.RefreshToken,
 	})
+}
+
+func (h *Handler) getUserPosts(c *gin.Context) {
+	userId, err := h.getUserId(c)
+	if err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	posts, err := h.services.Posts.GetAllUser(c.Request.Context(), userId)
+	if err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, dataResponse{
+		Data: posts,
+	})
+}
+
+func (h *Handler) getUserPostById(c *gin.Context) {
+	postId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	userId, err := h.getUserId(c)
+	if err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	post, err := h.services.Posts.GetByIdUser(c.Request.Context(), uint(postId), userId)
+	if err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, dataResponse{
+		Data: post,
+	})
+}
+
+func (h *Handler) createUserPost(c *gin.Context) {
+	var input domain.Post
+
+	if err := c.BindJSON(&input); err != nil {
+		newResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	userId, err := h.getUserId(c)
+	if err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if err := h.services.Posts.Create(c.Request.Context(), input, userId); err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, response{
+		Message: "success",
+	})
+}
+
+func (h *Handler) updateUserPost(c *gin.Context) {
+	panic("TODO")
+}
+
+func (h *Handler) deleteUserPost(c *gin.Context) {
+	panic("TODO")
 }

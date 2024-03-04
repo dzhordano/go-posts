@@ -5,7 +5,6 @@ import (
 
 	"github.com/dzhordano/go-posts/internal/domain"
 	"github.com/dzhordano/go-posts/internal/repository"
-	"github.com/google/uuid"
 )
 
 type AdminsService struct {
@@ -18,12 +17,12 @@ func NewAdminsService(repo repository.Admins) *AdminsService {
 	}
 }
 
-func (s *AdminsService) SignIN(ctx context.Context, input domain.UserSignInInput) (uuid.UUID, error) {
+func (s *AdminsService) SignIN(ctx context.Context, input domain.UserSignInInput) (uint, error) {
 	// TODO: implement hashing for input.password
 	admin, err := s.repo.GetByCredentials(ctx, input)
 	if err != nil {
-		return uuid.Nil, err
+		return 0, err
 	}
 
-	return admin.UID, nil
+	return admin.ID, nil
 }

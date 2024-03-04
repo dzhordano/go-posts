@@ -8,7 +8,6 @@ import (
 	"github.com/dzhordano/go-posts/internal/repository"
 	"github.com/dzhordano/go-posts/pkg/auth"
 	"github.com/dzhordano/go-posts/pkg/hasher"
-	"github.com/google/uuid"
 )
 
 type Users interface {
@@ -20,15 +19,18 @@ type Users interface {
 
 type Admins interface {
 	// TODO: also to return tokens instead of uuid
-	SignIN(ctx context.Context, input domain.UserSignInInput) (uuid.UUID, error)
+	SignIN(ctx context.Context, input domain.UserSignInInput) (uint, error)
 }
 
 type Posts interface {
-	Create(ctx context.Context, title, description string) error
+	Create(ctx context.Context, input domain.Post, userId uint) error
 	GetAll(ctx context.Context) ([]domain.Post, error)
 	GetById(ctx context.Context, postId uint) (domain.Post, error)
 	Update(ctx context.Context, input domain.UpdatePostInput) (domain.Post, error)
 	Delete(ctx context.Context) error
+	// TODO: do i need to keep those here (i think yes)
+	GetAllUser(ctx context.Context, userId uint) ([]domain.Post, error)
+	GetByIdUser(ctx context.Context, postId, userId uint) (domain.Post, error)
 }
 
 type Tokens struct {
@@ -53,8 +55,13 @@ type Deps struct {
 }
 
 func NewService(deps Deps) *Services {
+	postsService := NewPostsService(deps.Repos.Posts)
+	usersService := NewUsersService(deps.Repos.Users, deps.Hasher, deps.TokenManager, postsService, deps.AccessTokenTTL, deps.RefreshTokenTTL)
+	adminsService := NewAdminsService(deps.Repos.Admins)
+
 	return &Services{
-		Users:  NewUsersService(deps.Repos.Users, deps.Hasher, deps.TokenManager, deps.AccessTokenTTL, deps.RefreshTokenTTL),
-		Admins: NewAdminsService(deps.Repos.Admins),
+		Users:  usersService,
+		Admins: adminsService,
+		Posts:  postsService,
 	}
 }
