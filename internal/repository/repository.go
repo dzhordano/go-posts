@@ -26,6 +26,8 @@ type (
 	Admins interface {
 		GetById(ctx context.Context, userId uint) (domain.User, error)
 		GetByCredentials(ctx context.Context, input domain.UserSignInInput) (domain.User, error)
+		CreateSession(ctx context.Context, adminId uint, session domain.Session) error
+		GetByRefreshToken(ctx context.Context, refreshToken string) (domain.User, error)
 	}
 
 	Posts interface {
@@ -33,10 +35,12 @@ type (
 		GetAll(ctx context.Context) ([]domain.Post, error)
 		GetById(ctx context.Context, postId uint) (domain.Post, error)
 		Update(ctx context.Context, input domain.UpdatePostInput) (domain.Post, error)
-		Delete(ctx context.Context) error
+		Delete(ctx context.Context, postId uint) error
 
 		GetAllUser(ctx context.Context, userId uint) ([]domain.Post, error)
 		GetByIdUser(ctx context.Context, postId, userId uint) (domain.Post, error)
+		UpdateUser(ctx context.Context, input domain.UpdatePostInput, postId, userId uint) error
+		DeleteUser(ctx context.Context, postId, userId uint) error
 	}
 )
 

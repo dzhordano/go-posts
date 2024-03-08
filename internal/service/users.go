@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -12,9 +13,9 @@ import (
 )
 
 type UsersService struct {
-	repo        repository.Users
-	hasher      hasher.PassworsHasher
-	tokenManger auth.TokenManager
+	repo         repository.Users
+	hasher       hasher.PassworsHasher
+	tokenManager auth.TokenManager
 
 	postsService Posts
 
@@ -27,7 +28,7 @@ func NewUsersService(repo repository.Users, hasher hasher.PassworsHasher, tokenM
 		repo:            repo,
 		hasher:          hasher,
 		postsService:    postsService,
-		tokenManger:     tokenManager,
+		tokenManager:    tokenManager,
 		accessTokenTLL:  attl,
 		refreshTokenTLL: rttl,
 	}
@@ -46,7 +47,7 @@ func (s *UsersService) SignUP(ctx context.Context, input domain.UserSignUpInput)
 		Password: passwordHash,
 		Verification: domain.Verification{
 			Code:     "no-code",
-			Verified: false,
+			Verified: true,
 		},
 		RegisteredAt: time.Now(),
 		LastOnline:   time.Now(),
@@ -68,17 +69,21 @@ func (s *UsersService) SignIN(ctx context.Context, input domain.UserSignInInput)
 		return Tokens{}, err
 	}
 
+	if !user.Verification.Verified {
+		return Tokens{}, errors.New("user is not verified")
+	}
+
 	return s.createSession(ctx, user.ID)
 }
 
 func (s *UsersService) createSession(ctx context.Context, userId uint) (res Tokens, err error) {
 
-	res.AccessToken, err = s.tokenManger.CreateJWT(fmt.Sprintf("%x", userId), s.accessTokenTLL)
+	res.AccessToken, err = s.tokenManager.CreateJWT(fmt.Sprintf("%x", userId), s.accessTokenTLL)
 	if err != nil {
 		return
 	}
 
-	res.RefreshToken, err = s.tokenManger.CreateJWT(fmt.Sprintf("%x", userId), s.refreshTokenTLL)
+	res.RefreshToken, err = s.tokenManager.CreateJWT(fmt.Sprintf("%x", userId), s.refreshTokenTLL)
 	if err != nil {
 		return
 	}

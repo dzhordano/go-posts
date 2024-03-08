@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/dzhordano/go-posts/internal/domain"
@@ -77,14 +78,18 @@ func (r *PostsRepo) Update(ctx context.Context, input domain.UpdatePostInput) (d
 	panic("TODO")
 }
 
-func (r *PostsRepo) Delete(ctx context.Context) error {
-	panic("TODO")
+func (r *PostsRepo) Delete(ctx context.Context, postId uint) error {
+	query := fmt.Sprintf("DELETE FROM %s WHERE id = $1", posts_table)
+
+	_, err := r.db.Exec(ctx, query, postId)
+
+	return err
 }
 
 func (r *PostsRepo) GetAllUser(ctx context.Context, userId uint) ([]domain.Post, error) {
 	var posts []domain.Post
 
-	query := fmt.Sprintf("SELECT p.id, p.title, p.description, p.suspended, p.created, p.updated, p.likes, p.watched FROM %s p JOIN %s up ON p.id = up.post_id WHERE up.user_id = $1", posts_table, users_posts)
+	query := fmt.Sprintf("SELECT p.id, p.title, p.description, p.suspended, p.created, p.updated, p.likes, p.watched FROM %s p INNER JOIN %s up ON p.id = up.post_id WHERE up.user_id = $1", posts_table, users_posts)
 
 	rows, err := r.db.Query(ctx, query, userId)
 	if err != nil {
@@ -102,7 +107,7 @@ func (r *PostsRepo) GetAllUser(ctx context.Context, userId uint) ([]domain.Post,
 func (r *PostsRepo) GetByIdUser(ctx context.Context, postId, userId uint) (domain.Post, error) {
 	var post domain.Post
 
-	query := fmt.Sprintf("SELECT p.id, p.title, p.description, p.suspended, p.created, p.updated, p.likes, p.watched FROM %s p JOIN %s up ON p.id = up.post_id WHERE p.id = $1 AND up.user_id = $2", posts_table, users_posts)
+	query := fmt.Sprintf("SELECT p.id, p.title, p.description, p.suspended, p.created, p.updated, p.likes, p.watched FROM %s p INNER JOIN %s up ON p.id = up.post_id WHERE p.id = $1 AND up.user_id = $2", posts_table, users_posts)
 
 	row := r.db.QueryRow(ctx, query, postId, userId)
 
@@ -113,4 +118,41 @@ func (r *PostsRepo) GetByIdUser(ctx context.Context, postId, userId uint) (domai
 	}
 
 	return post, nil
+}
+
+func (r *PostsRepo) UpdateUser(ctx context.Context, input domain.UpdatePostInput, postId, userId uint) error {
+	setValues := make([]string, 0)
+	args := make([]interface{}, 0)
+	argId := 1
+
+	// CHECK IF VALUES ARE NIL AND IF NOT -> ADD THEM TO QUERY STRING AS setQuery
+	if input.Title != nil {
+		setValues = append(setValues, fmt.Sprintf("title=$%d", argId))
+		args = append(args, *input.Title)
+		argId++
+	}
+
+	if input.Description != nil {
+		setValues = append(setValues, fmt.Sprintf("description=$%d", argId))
+		args = append(args, *input.Description)
+		argId++
+	}
+
+	setQuery := strings.Join(setValues, ", ")
+
+	query := fmt.Sprintf("UPDATE %s p SET %s FROM %s up WHERE p.id = up.post_id AND up.post_id = $%d AND up.user_id = $%d", posts_table, setQuery, users_posts, argId, argId+1)
+
+	args = append(args, postId, userId)
+
+	_, err := r.db.Exec(ctx, query, args...)
+
+	return err
+}
+
+func (r *PostsRepo) DeleteUser(ctx context.Context, postId, userId uint) error {
+	query := fmt.Sprintf("DELETE FROM %s p USING %s up WHERE p.id = up.post_id AND up.post_id = $1 AND up.user_id = $2", posts_table, users_posts)
+
+	_, err := r.db.Exec(ctx, query, postId, userId)
+
+	return err
 }

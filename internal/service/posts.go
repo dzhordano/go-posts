@@ -33,8 +33,8 @@ func (s *PostsService) Update(ctx context.Context, input domain.UpdatePostInput)
 	panic("TODO")
 }
 
-func (s *PostsService) Delete(ctx context.Context) error {
-	panic("TODO")
+func (s *PostsService) Delete(ctx context.Context, postId uint) error {
+	return s.repo.Delete(ctx, postId)
 }
 
 func (s *PostsService) GetAllUser(ctx context.Context, userId uint) ([]domain.Post, error) {
@@ -43,4 +43,16 @@ func (s *PostsService) GetAllUser(ctx context.Context, userId uint) ([]domain.Po
 
 func (s *PostsService) GetByIdUser(ctx context.Context, postId, userId uint) (domain.Post, error) {
 	return s.repo.GetByIdUser(ctx, postId, userId)
+}
+
+func (s *PostsService) DeleteUser(ctx context.Context, postId, userId uint) error {
+	return s.repo.DeleteUser(ctx, postId, userId)
+}
+
+func (s *PostsService) UpdateUser(ctx context.Context, input domain.UpdatePostInput, postId, userId uint) error {
+	if err := input.Validate(); err != nil {
+		return err
+	}
+
+	return s.repo.UpdateUser(ctx, input, postId, userId)
 }

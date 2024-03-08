@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS admins (
     name TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL,
+    session session_type,
     registered TIMESTAMP WITHOUT TIME ZONE,
     lastonline TIMESTAMP WITHOUT TIME ZONE
 );
@@ -65,3 +66,6 @@ CREATE TABLE IF NOT EXISTS post_comments (
     post_id INTEGER REFERENCES posts (id) ON DELETE CASCADE NOT NULL,
     comment_id INTEGER REFERENCES comments (id) ON DELETE CASCADE NOT NULL
 );
+
+-- add admin
+INSERT INTO admins (name, email, password, registered, lastonline) VALUES ('dzhalal', 'dzhalal.2020@mail.ru', '686a6476626975616e34626e343538392d7976343039753731337639676e75696f676e647338399b53521c219540495d17f03d80294a3ddf3a6ddfe5cd84ea9faf3c6d01535e23', now(), now());

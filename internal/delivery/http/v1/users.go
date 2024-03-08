@@ -17,14 +17,11 @@ func (h *Handler) initUsersRoutes(api *gin.RouterGroup) {
 
 		auth := users.Group("/", h.userIdentity)
 		{
-			// TODO: remove this
-			auth.GET("/test", func(c *gin.Context) { c.JSON(http.StatusOK, "auth works!") })
 			posts := auth.Group("/posts")
 			{
 				posts.GET("/", h.getUserPosts)
 				posts.POST("/", h.createUserPost)
 				posts.GET("/:id", h.getUserPostById)
-				// not implemented ---
 				posts.PUT("/:id", h.updateUserPost)
 				posts.DELETE("/:id", h.deleteUserPost)
 			}
@@ -159,14 +156,58 @@ func (h *Handler) createUserPost(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, response{
-		Message: "success",
+		Message: "created",
 	})
 }
 
 func (h *Handler) updateUserPost(c *gin.Context) {
-	panic("TODO")
+	var input domain.UpdatePostInput
+	if err := c.BindJSON(&input); err != nil {
+		newResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	postId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	userId, err := h.getUserId(c)
+	if err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if err := h.services.Posts.UpdateUser(c.Request.Context(), input, uint(postId), userId); err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, response{
+		Message: "updated",
+	})
 }
 
 func (h *Handler) deleteUserPost(c *gin.Context) {
-	panic("TODO")
+	postId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	userId, err := h.getUserId(c)
+	if err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if err := h.services.Posts.DeleteUser(c.Request.Context(), uint(postId), userId); err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, response{
+		Message: "deleted",
+	})
 }

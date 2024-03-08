@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"errors"
 	"time"
 )
 
@@ -27,4 +28,12 @@ type Comment struct {
 type UpdatePostInput struct {
 	Title       *string
 	Description *string
+}
+
+func (i UpdatePostInput) Validate() error {
+	if i.Title == nil && i.Description == nil {
+		return errors.New("update input has no values")
+	}
+
+	return nil
 }
