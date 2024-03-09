@@ -17,6 +17,7 @@ const (
 type (
 	Users interface {
 		Create(ctx context.Context, user domain.User) error
+		GetAll(ctx context.Context) ([]domain.User, error)
 		GetById(ctx context.Context, userId uint) (domain.User, error)
 		GetByCredentials(ctx context.Context, input domain.UserSignInInput) (domain.User, error)
 		CreateSession(ctx context.Context, userId uint, session domain.Session) error
@@ -28,13 +29,15 @@ type (
 		GetByCredentials(ctx context.Context, input domain.UserSignInInput) (domain.User, error)
 		CreateSession(ctx context.Context, adminId uint, session domain.Session) error
 		GetByRefreshToken(ctx context.Context, refreshToken string) (domain.User, error)
+		UpdateUser(ctx context.Context, input domain.UpdateUserInput, userId uint) error
+		DeleteUser(ctx context.Context, userId uint) error
 	}
 
 	Posts interface {
 		Create(ctx context.Context, input domain.Post, userId uint) error
 		GetAll(ctx context.Context) ([]domain.Post, error)
 		GetById(ctx context.Context, postId uint) (domain.Post, error)
-		Update(ctx context.Context, input domain.UpdatePostInput) (domain.Post, error)
+		Update(ctx context.Context, input domain.UpdatePostInput, postId uint) error
 		Delete(ctx context.Context, postId uint) error
 
 		GetAllUser(ctx context.Context, userId uint) ([]domain.Post, error)

@@ -17,17 +17,19 @@ type AdminsService struct {
 	tokenManager auth.TokenManager
 
 	postsService Posts
+	usersService Users
 
 	accessTokenTLL  time.Duration
 	refreshTokenTLL time.Duration
 }
 
-func NewAdminsService(repo repository.Admins, hasher hasher.PassworsHasher, tokenManager auth.TokenManager, postsService Posts, attl, rttl time.Duration) *AdminsService {
+func NewAdminsService(repo repository.Admins, hasher hasher.PassworsHasher, tokenManager auth.TokenManager, postsService Posts, usersService Users, attl, rttl time.Duration) *AdminsService {
 	return &AdminsService{
 		repo:            repo,
 		hasher:          hasher,
 		tokenManager:    tokenManager,
 		postsService:    postsService,
+		usersService:    usersService,
 		accessTokenTLL:  attl,
 		refreshTokenTLL: rttl,
 	}
@@ -78,4 +80,16 @@ func (s *AdminsService) RefreshTokens(ctx context.Context, refreshToken string) 
 	}
 
 	return s.createSession(ctx, admin.ID)
+}
+
+func (s *AdminsService) UpdateUser(ctx context.Context, input domain.UpdateUserInput, userId uint) error {
+	if err := input.Validate(); err != nil {
+		return err
+	}
+
+	return s.repo.UpdateUser(ctx, input, userId)
+}
+
+func (s *AdminsService) DeleteUser(ctx context.Context, userId uint) error {
+	return s.repo.DeleteUser(ctx, userId)
 }

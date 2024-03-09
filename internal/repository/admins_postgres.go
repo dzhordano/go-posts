@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/dzhordano/go-posts/internal/domain"
@@ -21,7 +22,17 @@ func NewAdminsRepo(db *pgxpool.Pool) *AdminsRepo {
 }
 
 func (r *AdminsRepo) GetById(ctx context.Context, userId uint) (domain.User, error) {
-	panic("todo")
+	query := fmt.Sprintf("SELECT id, name, email, password, registered, lastonline FROM %s WHERE id = $1", admins_table)
+	row := r.db.QueryRow(ctx, query, userId)
+
+	var admin domain.User
+
+	err := row.Scan(&admin)
+	if err != nil {
+		return domain.User{}, err
+	}
+
+	return admin, nil
 }
 
 func (r *AdminsRepo) GetByCredentials(ctx context.Context, input domain.UserSignInInput) (domain.User, error) {
@@ -61,4 +72,56 @@ func (r *AdminsRepo) GetByRefreshToken(ctx context.Context, refreshToken string)
 	}
 
 	return admin, nil
+}
+
+func (r *AdminsRepo) UpdateUser(ctx context.Context, input domain.UpdateUserInput, userId uint) error {
+	setValues := make([]string, 0)
+	args := make([]interface{}, 0)
+	argId := 1
+
+	if input.Name != nil {
+		setValues = append(setValues, fmt.Sprintf("name=$%d", argId))
+		args = append(args, *input.Name)
+		argId++
+	}
+
+	if input.Password != nil {
+		setValues = append(setValues, fmt.Sprintf("password=$%d", argId))
+		args = append(args, *input.Password)
+		argId++
+	}
+
+	if input.Verification != nil {
+		setValues = append(setValues, fmt.Sprintf("(verification).code=$%d", argId))
+		args = append(args, *input.Password)
+		argId++
+
+		setValues = append(setValues, fmt.Sprintf("(verification).verified=$%d", argId))
+		args = append(args, *input.Password)
+		argId++
+	}
+
+	if input.Suspended != nil {
+		setValues = append(setValues, fmt.Sprintf("suspended=$%d", argId))
+		args = append(args, *input.Password)
+		argId++
+	}
+
+	setQuery := strings.Join(setValues, ", ")
+
+	query := fmt.Sprintf("UPDATE %s SET %s WHERE id = $%d", users_table, setQuery, argId)
+
+	args = append(args, userId)
+
+	_, err := r.db.Exec(ctx, query, args...)
+
+	return err
+}
+
+func (r *AdminsRepo) DeleteUser(ctx context.Context, userId uint) error {
+	query := fmt.Sprintf("DELETE FROM %s WHERE id = $1", users_table)
+
+	_, err := r.db.Exec(ctx, query, userId)
+
+	return err
 }

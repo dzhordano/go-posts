@@ -29,8 +29,12 @@ func (s *PostsService) GetById(ctx context.Context, postId uint) (domain.Post, e
 	return s.repo.GetById(ctx, postId)
 }
 
-func (s *PostsService) Update(ctx context.Context, input domain.UpdatePostInput) (domain.Post, error) {
-	panic("TODO")
+func (s *PostsService) Update(ctx context.Context, input domain.UpdatePostInput, postId uint) error {
+	if err := input.Validate(); err != nil {
+		return err
+	}
+
+	return s.repo.Update(ctx, input, postId)
 }
 
 func (s *PostsService) Delete(ctx context.Context, postId uint) error {

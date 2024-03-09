@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/dzhordano/go-posts/internal/domain"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -20,28 +21,11 @@ func NewUsersRepo(db *pgxpool.Pool) *UsersRepo {
 }
 
 func (r *UsersRepo) Create(ctx context.Context, user domain.User) error {
-	query := fmt.Sprintf("INSERT INTO %s (name, email, password, registered, lastonline, verification.code, verification.verified) VALUES ($1, $2, $3, $4, $5, $6, $7)", users_table)
+	query := fmt.Sprintf("INSERT INTO %s (name, email, password, registered, lastonline, verification.code, verification.verified, session.rtoken, session.expiresat) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)", users_table)
 
-	_, err := r.db.Exec(ctx, query, user.Name, user.Email, user.Password, user.RegisteredAt, user.LastOnline, user.Verification.Code, user.Verification.Verified)
+	_, err := r.db.Exec(ctx, query, user.Name, user.Email, user.Password, user.RegisteredAt, user.LastOnline, user.Verification.Code, user.Verification.Verified, user.Session.RefreshToken, user.Session.ExpiresAt)
 
 	return err
-}
-
-func (r *UsersRepo) GetById(ctx context.Context, userId uint) (domain.User, error) {
-	// TODO: test this
-	query := fmt.Sprintf("SELECT id, name, email, password, (verification).code, (verification).verified, registered, lastonline FROM %s WHERE id = $1", users_table)
-
-	row := r.db.QueryRow(ctx, query, userId)
-
-	var user domain.User
-
-	// TODO: do i need to set session values?
-	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Password, &user.Verification.Code, &user.Verification.Verified, &user.Suspended, &user.RegisteredAt, &user.LastOnline)
-	if err != nil {
-		return domain.User{}, err
-	}
-
-	return user, nil
 }
 
 func (r *UsersRepo) GetByCredentials(ctx context.Context, input domain.UserSignInInput) (domain.User, error) {
@@ -76,6 +60,37 @@ func (r *UsersRepo) GetByRefreshToken(ctx context.Context, refreshToken string) 
 	var user domain.User
 
 	err := row.Scan(&user)
+	if err != nil {
+		return domain.User{}, err
+	}
+
+	return user, nil
+}
+func (r *UsersRepo) GetAll(ctx context.Context) ([]domain.User, error) {
+	query := fmt.Sprintf("SELECT id, name, email, password, (verification).code, (verification).verified, (session).rtoken, (session).expiresat, suspended, registered, lastonline FROM %s", users_table)
+
+	rows, err := r.db.Query(ctx, query)
+	if err != nil {
+		return []domain.User{}, err
+	}
+
+	users, err := pgx.CollectRows(rows, pgx.RowToStructByName[domain.User])
+	if err != nil {
+		fmt.Println(users)
+		return []domain.User{}, err
+	}
+
+	return users, nil
+}
+
+func (r *UsersRepo) GetById(ctx context.Context, userId uint) (domain.User, error) {
+	query := fmt.Sprintf("SELECT id, name, email, password, (verification).code, (verification).verified, suspended, registered, lastonline FROM %s WHERE id = $1", users_table)
+
+	row := r.db.QueryRow(ctx, query, userId)
+
+	var user domain.User
+
+	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Password, &user.Verification.Code, &user.Verification.Verified, &user.Suspended, &user.RegisteredAt, &user.LastOnline)
 	if err != nil {
 		return domain.User{}, err
 	}

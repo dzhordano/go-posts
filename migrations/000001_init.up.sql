@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS posts (
     id SERIAL PRIMARY KEY,
     title TEXT NOT NULL,
     description TEXT,
+    author TEXT NOT NULL,
     suspended BOOLEAN DEFAULT FALSE,
     created TIMESTAMP WITHOUT TIME ZONE,
     updated TIMESTAMP WITHOUT TIME ZONE,

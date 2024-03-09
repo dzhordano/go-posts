@@ -14,18 +14,23 @@ type Users interface {
 	SignUP(ctx context.Context, input domain.UserSignUpInput) error
 	SignIN(ctx context.Context, input domain.UserSignInInput) (Tokens, error)
 	RefreshTokens(ctx context.Context, refreshToken string) (Tokens, error)
+	GetAll(ctx context.Context) ([]domain.User, error)
+	GetById(ctx context.Context, userId uint) (domain.User, error)
 }
 
 type Admins interface {
 	SignIN(ctx context.Context, input domain.UserSignInInput) (Tokens, error)
 	RefreshTokens(ctx context.Context, refreshToken string) (Tokens, error)
+
+	UpdateUser(ctx context.Context, input domain.UpdateUserInput, userId uint) error
+	DeleteUser(ctx context.Context, userId uint) error
 }
 
 type Posts interface {
 	Create(ctx context.Context, input domain.Post, userId uint) error
 	GetAll(ctx context.Context) ([]domain.Post, error)
 	GetById(ctx context.Context, postId uint) (domain.Post, error)
-	Update(ctx context.Context, input domain.UpdatePostInput) (domain.Post, error)
+	Update(ctx context.Context, input domain.UpdatePostInput, postId uint) error
 	Delete(ctx context.Context, postId uint) error
 	// TODO: do i need to keep those here (i think yes)
 	GetAllUser(ctx context.Context, userId uint) ([]domain.Post, error)
@@ -58,7 +63,7 @@ type Deps struct {
 func NewService(deps Deps) *Services {
 	postsService := NewPostsService(deps.Repos.Posts)
 	usersService := NewUsersService(deps.Repos.Users, deps.Hasher, deps.TokenManager, postsService, deps.AccessTokenTTL, deps.RefreshTokenTTL)
-	adminsService := NewAdminsService(deps.Repos.Admins, deps.Hasher, deps.TokenManager, postsService, deps.AccessTokenTTL, deps.RefreshTokenTTL)
+	adminsService := NewAdminsService(deps.Repos.Admins, deps.Hasher, deps.TokenManager, postsService, usersService, deps.AccessTokenTTL, deps.RefreshTokenTTL)
 
 	return &Services{
 		Users:  usersService,

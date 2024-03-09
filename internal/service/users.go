@@ -49,6 +49,10 @@ func (s *UsersService) SignUP(ctx context.Context, input domain.UserSignUpInput)
 			Code:     "no-code",
 			Verified: true,
 		},
+		Session: domain.Session{
+			RefreshToken: "null",
+			ExpiresAt:    time.Now(),
+		},
 		RegisteredAt: time.Now(),
 		LastOnline:   time.Now(),
 	}
@@ -105,4 +109,12 @@ func (s *UsersService) RefreshTokens(ctx context.Context, refreshToken string) (
 	}
 
 	return s.createSession(ctx, user.ID)
+}
+
+func (s *UsersService) GetAll(ctx context.Context) ([]domain.User, error) {
+	return s.repo.GetAll(ctx)
+}
+
+func (s *UsersService) GetById(ctx context.Context, userId uint) (domain.User, error) {
+	return s.repo.GetById(ctx, userId)
 }

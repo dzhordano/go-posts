@@ -98,12 +98,14 @@ func (h *Handler) getUserPosts(c *gin.Context) {
 	userId, err := h.getUserId(c)
 	if err != nil {
 		newResponse(c, http.StatusInternalServerError, err.Error())
+
 		return
 	}
 
 	posts, err := h.services.Posts.GetAllUser(c.Request.Context(), userId)
 	if err != nil {
 		newResponse(c, http.StatusInternalServerError, err.Error())
+
 		return
 	}
 
@@ -116,18 +118,21 @@ func (h *Handler) getUserPostById(c *gin.Context) {
 	postId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		newResponse(c, http.StatusBadRequest, err.Error())
+
 		return
 	}
 
 	userId, err := h.getUserId(c)
 	if err != nil {
 		newResponse(c, http.StatusInternalServerError, err.Error())
+
 		return
 	}
 
 	post, err := h.services.Posts.GetByIdUser(c.Request.Context(), uint(postId), userId)
 	if err != nil {
 		newResponse(c, http.StatusInternalServerError, err.Error())
+
 		return
 	}
 
@@ -141,17 +146,20 @@ func (h *Handler) createUserPost(c *gin.Context) {
 
 	if err := c.BindJSON(&input); err != nil {
 		newResponse(c, http.StatusBadRequest, err.Error())
+
 		return
 	}
 
 	userId, err := h.getUserId(c)
 	if err != nil {
 		newResponse(c, http.StatusInternalServerError, err.Error())
+
 		return
 	}
 
 	if err := h.services.Posts.Create(c.Request.Context(), input, userId); err != nil {
 		newResponse(c, http.StatusInternalServerError, err.Error())
+
 		return
 	}
 
@@ -164,23 +172,27 @@ func (h *Handler) updateUserPost(c *gin.Context) {
 	var input domain.UpdatePostInput
 	if err := c.BindJSON(&input); err != nil {
 		newResponse(c, http.StatusBadRequest, err.Error())
+
 		return
 	}
 
 	postId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		newResponse(c, http.StatusBadRequest, err.Error())
+
 		return
 	}
 
 	userId, err := h.getUserId(c)
 	if err != nil {
 		newResponse(c, http.StatusInternalServerError, err.Error())
+
 		return
 	}
 
 	if err := h.services.Posts.UpdateUser(c.Request.Context(), input, uint(postId), userId); err != nil {
 		newResponse(c, http.StatusInternalServerError, err.Error())
+
 		return
 	}
 
@@ -193,17 +205,20 @@ func (h *Handler) deleteUserPost(c *gin.Context) {
 	postId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		newResponse(c, http.StatusBadRequest, err.Error())
+
 		return
 	}
 
 	userId, err := h.getUserId(c)
 	if err != nil {
 		newResponse(c, http.StatusInternalServerError, err.Error())
+
 		return
 	}
 
 	if err := h.services.Posts.DeleteUser(c.Request.Context(), uint(postId), userId); err != nil {
 		newResponse(c, http.StatusInternalServerError, err.Error())
+
 		return
 	}
 

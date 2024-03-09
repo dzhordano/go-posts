@@ -9,6 +9,7 @@ type Post struct {
 	ID          uint      `json:"id"`
 	Title       string    `json:"title" binding:"required"`
 	Description string    `json:"description"  binding:"required"`
+	Author      string    `json:"author"`
 	Suspended   bool      `json:"suspended"`
 	CreatedAt   time.Time `json:"createdAt" db:"created"`
 	UpdatedAt   time.Time `json:"updatedAt" db:"updated"`

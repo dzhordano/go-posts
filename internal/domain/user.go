@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"errors"
 	"time"
 )
 
@@ -30,4 +31,19 @@ type UserSignUpInput struct {
 type UserSignInInput struct {
 	Email    string `json:"email" binding:"required,email,max=64"`
 	Password string `json:"password" binding:"required,min=8,max=64"`
+}
+
+type UpdateUserInput struct {
+	Name     *string
+	Password *string
+	*Verification
+	Suspended *bool
+}
+
+func (i UpdateUserInput) Validate() error {
+	if i.Name == nil && i.Password == nil && i.Verification == nil && i.Suspended == nil {
+		return errors.New("update input has no values")
+	}
+
+	return nil
 }
