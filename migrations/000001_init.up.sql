@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS posts (
     title TEXT NOT NULL,
     description TEXT,
     author TEXT NOT NULL,
+    comments INTEGER NOT NULL DEFAULT 0,
     suspended BOOLEAN DEFAULT FALSE,
     created TIMESTAMP WITHOUT TIME ZONE,
     updated TIMESTAMP WITHOUT TIME ZONE,
@@ -44,6 +45,7 @@ CREATE TABLE IF NOT EXISTS posts (
 
 CREATE TABLE IF NOT EXISTS comments (
     id SERIAL PRIMARY KEY,
+    author TEXT NOT NULL,
     comment TEXT NOT NULL,
     created TIMESTAMP WITHOUT TIME ZONE,
     updated TIMESTAMP WITHOUT TIME ZONE,
@@ -62,11 +64,11 @@ CREATE TABLE IF NOT EXISTS users_comments (
     user_id INTEGER REFERENCES users (id) ON DELETE CASCADE NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS post_comments (
+CREATE TABLE IF NOT EXISTS posts_comments (
     id SERIAL PRIMARY KEY,
     post_id INTEGER REFERENCES posts (id) ON DELETE CASCADE NOT NULL,
     comment_id INTEGER REFERENCES comments (id) ON DELETE CASCADE NOT NULL
 );
 
 -- add admin
-INSERT INTO admins (name, email, password, registered, lastonline) VALUES ('dzhalal', 'dzhalal.2020@mail.ru', '686a6476626975616e34626e343538392d7976343039753731337639676e75696f676e647338399b53521c219540495d17f03d80294a3ddf3a6ddfe5cd84ea9faf3c6d01535e23', now(), now());
+INSERT INTO admins (name, email, password, registered, lastonline) VALUES ('admin', 'admin@mail.ru', '686a6476626975616e34626e343538392d7976343039753731337639676e75696f676e647338399b53521c219540495d17f03d80294a3ddf3a6ddfe5cd84ea9faf3c6d01535e23', now(), now());

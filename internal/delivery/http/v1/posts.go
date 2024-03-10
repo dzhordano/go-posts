@@ -12,6 +12,9 @@ func (h *Handler) initPostsRoutes(api *gin.RouterGroup) {
 	{
 		posts.GET("/", h.getAllPosts)
 		posts.GET("/:id", h.getPostById)
+
+		posts.GET("/:id/comments", h.getPostComments)
+
 	}
 }
 
@@ -43,5 +46,25 @@ func (h *Handler) getPostById(c *gin.Context) {
 
 	c.JSON(http.StatusOK, dataResponse{
 		Data: post,
+	})
+}
+
+func (h *Handler) getPostComments(c *gin.Context) {
+	postId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newResponse(c, http.StatusBadRequest, err.Error())
+
+		return
+	}
+
+	comments, err := h.services.Comments.GetComments(c.Request.Context(), uint(postId))
+	if err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+
+		return
+	}
+
+	c.JSON(http.StatusOK, dataResponse{
+		Data: comments,
 	})
 }

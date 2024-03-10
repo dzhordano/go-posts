@@ -24,6 +24,9 @@ func (h *Handler) initUsersRoutes(api *gin.RouterGroup) {
 				posts.GET("/:id", h.getUserPostById)
 				posts.PUT("/:id", h.updateUserPost)
 				posts.DELETE("/:id", h.deleteUserPost)
+
+				posts.GET("/:id/comments", h.getPostComments) // implemented in posts.go
+				posts.POST("/:id/comments", h.createPostComment)
 			}
 		}
 	}
@@ -224,5 +227,31 @@ func (h *Handler) deleteUserPost(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response{
 		Message: "deleted",
+	})
+}
+
+func (h *Handler) createPostComment(c *gin.Context) {
+	var input domain.Comment
+	if err := c.BindJSON(&input); err != nil {
+		newResponse(c, http.StatusBadRequest, err.Error())
+
+		return
+	}
+
+	postId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newResponse(c, http.StatusBadRequest, err.Error())
+
+		return
+	}
+
+	if err := h.services.Comments.Create(c.Request.Context(), input, uint(postId)); err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+
+		return
+	}
+
+	c.JSON(http.StatusOK, response{
+		Message: "created",
 	})
 }

@@ -17,17 +17,19 @@ type UsersService struct {
 	hasher       hasher.PassworsHasher
 	tokenManager auth.TokenManager
 
-	postsService Posts
+	postsService    Posts
+	commentsService Comments
 
 	accessTokenTLL  time.Duration
 	refreshTokenTLL time.Duration
 }
 
-func NewUsersService(repo repository.Users, hasher hasher.PassworsHasher, tokenManager auth.TokenManager, postsService Posts, attl, rttl time.Duration) *UsersService {
+func NewUsersService(repo repository.Users, hasher hasher.PassworsHasher, tokenManager auth.TokenManager, postsService Posts, commentsService Comments, attl, rttl time.Duration) *UsersService {
 	return &UsersService{
 		repo:            repo,
 		hasher:          hasher,
 		postsService:    postsService,
+		commentsService: commentsService,
 		tokenManager:    tokenManager,
 		accessTokenTLL:  attl,
 		refreshTokenTLL: rttl,

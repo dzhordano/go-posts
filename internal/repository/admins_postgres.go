@@ -125,3 +125,19 @@ func (r *AdminsRepo) DeleteUser(ctx context.Context, userId uint) error {
 
 	return err
 }
+
+func (r *AdminsRepo) SuspendUser(ctx context.Context, userId uint) error {
+	query := fmt.Sprintf("UPDATE %s SET suspended = $1 WHERE id = $2", users_table)
+
+	_, err := r.db.Exec(ctx, query, true, userId)
+
+	return err
+}
+
+func (r *AdminsRepo) SuspendPost(ctx context.Context, postId uint) error {
+	query := fmt.Sprintf("UPDATE %s SET suspended = $1 WHERE id = $2", posts_table)
+
+	_, err := r.db.Exec(ctx, query, true, postId)
+
+	return err
+}

@@ -9,11 +9,14 @@ import (
 
 type PostsService struct {
 	repo repository.Posts
+
+	commentsService Comments
 }
 
-func NewPostsService(repo repository.Posts) *PostsService {
+func NewPostsService(repo repository.Posts, commentsService Comments) *PostsService {
 	return &PostsService{
-		repo: repo,
+		repo:            repo,
+		commentsService: commentsService,
 	}
 }
 

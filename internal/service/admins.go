@@ -41,7 +41,6 @@ func (s *AdminsService) SignIN(ctx context.Context, input domain.UserSignInInput
 		return Tokens{}, err
 	}
 	input.Password = passwordHash
-	fmt.Println(passwordHash)
 
 	admin, err := s.repo.GetByCredentials(ctx, input)
 	if err != nil {
@@ -92,4 +91,12 @@ func (s *AdminsService) UpdateUser(ctx context.Context, input domain.UpdateUserI
 
 func (s *AdminsService) DeleteUser(ctx context.Context, userId uint) error {
 	return s.repo.DeleteUser(ctx, userId)
+}
+
+func (s *AdminsService) SuspendUser(ctx context.Context, userId uint) error {
+	return s.repo.SuspendUser(ctx, userId)
+}
+
+func (s *AdminsService) SuspendPost(ctx context.Context, postId uint) error {
+	return s.repo.SuspendPost(ctx, postId)
 }

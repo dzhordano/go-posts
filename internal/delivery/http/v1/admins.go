@@ -20,6 +20,7 @@ func (h *Handler) initAdminsRoutes(api *gin.RouterGroup) {
 			{
 				users.GET("/", h.adminGetUsers)
 				users.GET("/:id", h.adminGetUserById)
+				users.POST("/:id/suspend", h.adminSuspendUser)
 				users.PUT("/:id", h.adminAlterUser)
 				users.DELETE("/:id", h.adminDeleteUser)
 			}
@@ -28,6 +29,7 @@ func (h *Handler) initAdminsRoutes(api *gin.RouterGroup) {
 			{
 				posts.GET("/", h.adminGetPosts)
 				posts.GET("/:id", h.adminGetPostById)
+				posts.POST("/:id/suspend", h.adminSuspendPost)
 				posts.PUT("/:id", h.adminAlterPost)
 				posts.DELETE("/:id", h.adminDeletePost)
 			}
@@ -151,6 +153,25 @@ func (h *Handler) adminDeleteUser(c *gin.Context) {
 	})
 }
 
+func (h *Handler) adminSuspendUser(c *gin.Context) {
+	userId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newResponse(c, http.StatusBadRequest, err.Error())
+
+		return
+	}
+
+	if err := h.services.Admins.SuspendUser(c.Request.Context(), uint(userId)); err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+
+		return
+	}
+
+	c.JSON(http.StatusOK, response{
+		Message: "suspended",
+	})
+}
+
 func (h *Handler) adminGetPosts(c *gin.Context) {
 	posts, err := h.services.Posts.GetAll(c.Request.Context())
 	if err != nil {
@@ -224,5 +245,21 @@ func (h *Handler) adminDeletePost(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response{
 		Message: "deleted",
+	})
+}
+func (h *Handler) adminSuspendPost(c *gin.Context) {
+	postId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if err := h.services.Admins.SuspendPost(c.Request.Context(), uint(postId)); err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, response{
+		Message: "suspended",
 	})
 }

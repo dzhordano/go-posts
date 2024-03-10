@@ -8,10 +8,14 @@ import (
 )
 
 const (
-	users_table  = "users"
-	admins_table = "admins"
-	posts_table  = "posts"
-	users_posts  = "users_posts"
+	users_table    = "users"
+	admins_table   = "admins"
+	posts_table    = "posts"
+	comments_table = "comments"
+
+	users_posts    = "users_posts"
+	posts_comments = "posts_comments"
+	users_comments = "users_comments"
 )
 
 type (
@@ -29,8 +33,11 @@ type (
 		GetByCredentials(ctx context.Context, input domain.UserSignInInput) (domain.User, error)
 		CreateSession(ctx context.Context, adminId uint, session domain.Session) error
 		GetByRefreshToken(ctx context.Context, refreshToken string) (domain.User, error)
+
 		UpdateUser(ctx context.Context, input domain.UpdateUserInput, userId uint) error
 		DeleteUser(ctx context.Context, userId uint) error
+		SuspendUser(ctx context.Context, userId uint) error
+		SuspendPost(ctx context.Context, postId uint) error
 	}
 
 	Posts interface {
@@ -45,18 +52,25 @@ type (
 		UpdateUser(ctx context.Context, input domain.UpdatePostInput, postId, userId uint) error
 		DeleteUser(ctx context.Context, postId, userId uint) error
 	}
+
+	Comments interface {
+		Create(ctx context.Context, input domain.Comment, postId uint) error
+		GetComments(ctx context.Context, postId uint) ([]domain.Comment, error)
+	}
 )
 
 type Repos struct {
-	Users  Users
-	Admins Admins
-	Posts  Posts
+	Users    Users
+	Admins   Admins
+	Posts    Posts
+	Comments Comments
 }
 
 func NewRepos(db *pgxpool.Pool) *Repos {
 	return &Repos{
-		Users:  NewUsersRepo(db),
-		Admins: NewAdminsRepo(db),
-		Posts:  NewPostsRepo(db),
+		Users:    NewUsersRepo(db),
+		Admins:   NewAdminsRepo(db),
+		Posts:    NewPostsRepo(db),
+		Comments: NewCommentsRepo(db),
 	}
 }

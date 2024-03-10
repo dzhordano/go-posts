@@ -11,6 +11,7 @@ type Post struct {
 	Description string    `json:"description"  binding:"required"`
 	Author      string    `json:"author"`
 	Suspended   bool      `json:"suspended"`
+	Comments    int       `json:"comments"`
 	CreatedAt   time.Time `json:"createdAt" db:"created"`
 	UpdatedAt   time.Time `json:"updatedAt" db:"updated"`
 	Likes       uint      `json:"likes"`
@@ -19,8 +20,8 @@ type Post struct {
 
 type Comment struct {
 	ID          uint   `json:"id"`
-	UserName    string `json:"username"`
-	Data        string `json:"data"`
+	Author      string `json:"username"`
+	Data        string `json:"data" binding:"required"`
 	CommentedAt string `json:"commented_at"`
 	UpdatedAt   string `json:"updated_at"`
 	Censored    bool   `json:"censored"`
