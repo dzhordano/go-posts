@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/dzhordano/go-posts/internal/domain"
 	"github.com/jackc/pgx/v5"
@@ -20,13 +21,24 @@ func NewCommentsRepo(db *pgxpool.Pool) *CommentsRepo {
 }
 
 func (r *CommentsRepo) Create(ctx context.Context, input domain.Comment, postId uint) error {
-	panic("TODO")
+	// TODO: reimplement with tx.Begin()
+	qCommsTable := fmt.Sprintf("INSERT INTO %s (post_id, author_id, comment, created, updated) VALUES ($1, $2, $3, $4, $5)", comments_table)
+
+	_, err := r.db.Exec(ctx, qCommsTable, postId, input.AuthorId, input.Data, time.Now(), time.Now())
+	if err != nil {
+		return err
+	}
+
+	qPostsCommCount := fmt.Sprintf("UPDATE %s SET comments = comments + 1 WHERE id = $1", posts_table)
+	_, err = r.db.Exec(ctx, qPostsCommCount, postId)
+
+	return err
 }
 
 func (r *CommentsRepo) GetComments(ctx context.Context, postId uint) ([]domain.Comment, error) {
 	var comments []domain.Comment
 
-	query := fmt.Sprintf("SELECT c.id, c.author, c.comment, c.created, c.updated, c.censored FROM %s c INNER JOIN %s pc ON c.id = pc.comment_id WHERE pc.post_id = $1", comments_table, posts_comments)
+	query := fmt.Sprintf("SELECT id, post_id, author_id, comment, created, updated, censored FROM %s WHERE post_id = $1", comments_table)
 
 	rows, err := r.db.Query(ctx, query, postId)
 	if err != nil {

@@ -13,9 +13,7 @@ const (
 	posts_table    = "posts"
 	comments_table = "comments"
 
-	users_posts    = "users_posts"
-	posts_comments = "posts_comments"
-	users_comments = "users_comments"
+	users_posts = "users_posts"
 )
 
 type (

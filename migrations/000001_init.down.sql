@@ -1,8 +1,4 @@
-DROP TABLE IF EXISTS post_comments;
-
 DROP TABLE IF EXISTS users_posts;
-
-DROP TABLE IF EXISTS users_comments;
 
 DROP TABLE IF EXISTS comments;
 

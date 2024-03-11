@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// FIXME: change createdAt -> created and updatedAt -> updated
 type Post struct {
 	ID          uint      `json:"id"`
 	Title       string    `json:"title" binding:"required"`
@@ -19,12 +20,14 @@ type Post struct {
 }
 
 type Comment struct {
-	ID          uint   `json:"id"`
-	Author      string `json:"username"`
-	Data        string `json:"data" binding:"required"`
-	CommentedAt string `json:"commented_at"`
-	UpdatedAt   string `json:"updated_at"`
-	Censored    bool   `json:"censored"`
+	ID       uint `json:"id"`
+	PostId   uint `json:"post_id"`
+	AuthorId uint `json:"author_id"`
+	// FIXME: change in sql table comment -> data
+	Data     string    `json:"data" binding:"required" db:"comment"`
+	Created  time.Time `json:"commented_at"`
+	Updated  time.Time `json:"updated_at"`
+	Censored bool      `json:"censored"`
 }
 
 type UpdatePostInput struct {

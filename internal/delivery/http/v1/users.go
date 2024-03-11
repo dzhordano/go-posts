@@ -160,6 +160,15 @@ func (h *Handler) createUserPost(c *gin.Context) {
 		return
 	}
 
+	user, err := h.services.Users.GetById(c.Request.Context(), userId)
+	if err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+
+		return
+	}
+
+	input.Author = user.Name
+
 	if err := h.services.Posts.Create(c.Request.Context(), input, userId); err != nil {
 		newResponse(c, http.StatusInternalServerError, err.Error())
 
@@ -237,6 +246,15 @@ func (h *Handler) createPostComment(c *gin.Context) {
 
 		return
 	}
+
+	userId, err := h.getUserId(c)
+	if err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+
+		return
+	}
+
+	input.AuthorId = userId
 
 	postId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

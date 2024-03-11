@@ -24,19 +24,18 @@ func NewPostsRepo(db *pgxpool.Pool) *PostsRepo {
 func (r *PostsRepo) Create(ctx context.Context, input domain.Post, userId uint) error {
 	// TODO: reimplement with r.db.BeginTx()
 	// this inserts into posts_table the post we create and also pulls name of author from db
-	qPostsTable := fmt.Sprintf("INSERT INTO %s (title, description, author, created, updated) VALUES ($1, $2, (SELECT name FROM %s WHERE id = $3), $4, $5) RETURNING id", posts_table, users_table)
+	qPostsTable := fmt.Sprintf("INSERT INTO %s (title, description, author, created, updated) VALUES ($1, $2, $3, $4, $5) RETURNING id", posts_table)
 
 	var postId int
-	row := r.db.QueryRow(ctx, qPostsTable, input.Title, input.Description, userId, time.Now(), time.Now())
+	row := r.db.QueryRow(ctx, qPostsTable, input.Title, input.Description, input.Author, time.Now(), time.Now())
 
-	err := row.Scan(&postId)
-	if err != nil {
+	if err := row.Scan(&postId); err != nil {
 		return err
 	}
 
 	qUsersPosts := fmt.Sprintf("INSERT INTO %s (post_id, user_id) VALUES ($1, $2)", users_posts)
 
-	_, err = r.db.Exec(ctx, qUsersPosts, postId, userId)
+	_, err := r.db.Exec(ctx, qUsersPosts, postId, userId)
 
 	return err
 }
@@ -62,12 +61,12 @@ func (r *PostsRepo) GetAll(ctx context.Context) ([]domain.Post, error) {
 func (r *PostsRepo) GetById(ctx context.Context, postId uint) (domain.Post, error) {
 	var post domain.Post
 
-	query := fmt.Sprintf("SELECT id, title, description, suspended, comments, created, updated, likes, watched FROM %s WHERE id = $1", posts_table)
+	query := fmt.Sprintf("SELECT id, title, description, author, suspended, comments, created, updated, likes, watched FROM %s WHERE id = $1", posts_table)
 
 	row := r.db.QueryRow(ctx, query, postId)
 
 	// TODO: do i need to set session values?
-	err := row.Scan(&post.ID, &post.Title, &post.Description, &post.Suspended, &post.Comments, &post.CreatedAt, &post.UpdatedAt, &post.Likes, &post.Watched)
+	err := row.Scan(&post.ID, &post.Title, &post.Description, &post.Author, &post.Suspended, &post.Comments, &post.CreatedAt, &post.UpdatedAt, &post.Likes, &post.Watched)
 	if err != nil {
 		return domain.Post{}, err
 	}
@@ -137,7 +136,7 @@ func (r *PostsRepo) GetByIdUser(ctx context.Context, postId, userId uint) (domai
 	row := r.db.QueryRow(ctx, query, postId, userId)
 
 	// TODO: do i need to set session values?
-	err := row.Scan(&post.ID, &post.Title, &post.Description, &post.Author, &post.Comments, &post.Suspended, &post.CreatedAt, &post.UpdatedAt, &post.Likes, &post.Watched)
+	err := row.Scan(&post.ID, &post.Title, &post.Description, &post.Author, &post.Suspended, &post.Comments, &post.CreatedAt, &post.UpdatedAt, &post.Likes, &post.Watched)
 	if err != nil {
 		return domain.Post{}, err
 	}
