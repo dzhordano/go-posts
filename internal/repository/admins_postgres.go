@@ -127,17 +127,25 @@ func (r *AdminsRepo) DeleteUser(ctx context.Context, userId uint) error {
 }
 
 func (r *AdminsRepo) SuspendUser(ctx context.Context, userId uint) error {
-	query := fmt.Sprintf("UPDATE %s SET suspended = $1 WHERE id = $2", users_table)
+	query := fmt.Sprintf("UPDATE %s SET suspended = TRUE WHERE id = $1", users_table)
 
-	_, err := r.db.Exec(ctx, query, true, userId)
+	_, err := r.db.Exec(ctx, query, userId)
 
 	return err
 }
 
 func (r *AdminsRepo) SuspendPost(ctx context.Context, postId uint) error {
-	query := fmt.Sprintf("UPDATE %s SET suspended = $1 WHERE id = $2", posts_table)
+	query := fmt.Sprintf("UPDATE %s SET suspended = TRUE WHERE id = $1", posts_table)
 
-	_, err := r.db.Exec(ctx, query, true, postId)
+	_, err := r.db.Exec(ctx, query, postId)
+
+	return err
+}
+
+func (r *AdminsRepo) CensorComment(ctx context.Context, postId, commId uint) error {
+	query := fmt.Sprintf("UPDATE %s SET censored = TRUE WHERE post_id = $1 AND id = $2", comments_table)
+
+	_, err := r.db.Exec(ctx, query, postId, commId)
 
 	return err
 }

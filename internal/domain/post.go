@@ -20,11 +20,10 @@ type Post struct {
 }
 
 type Comment struct {
-	ID       uint `json:"id"`
-	PostId   uint `json:"post_id"`
-	AuthorId uint `json:"author_id"`
-	// FIXME: change in sql table comment -> data
-	Data     string    `json:"data" binding:"required" db:"comment"`
+	ID       uint      `json:"id"`
+	PostId   uint      `json:"post_id"`
+	AuthorId uint      `json:"author_id"`
+	Data     string    `json:"data" binding:"required"`
 	Created  time.Time `json:"commented_at"`
 	Updated  time.Time `json:"updated_at"`
 	Censored bool      `json:"censored"`

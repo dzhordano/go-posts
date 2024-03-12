@@ -20,21 +20,75 @@ func (h *Handler) initAdminsRoutes(api *gin.RouterGroup) {
 			{
 				users.GET("/", h.adminGetUsers)
 				users.GET("/:id", h.adminGetUserById)
+				users.GET("/:id/posts", h.adminGetUserPosts)       // implemented in v1/users.go
+				users.GET("/:id/comments", h.adminGetUserComments) // implemented in v1/users.go
+
 				users.POST("/:id/suspend", h.adminSuspendUser)
+
 				users.PUT("/:id", h.adminAlterUser)
+
 				users.DELETE("/:id", h.adminDeleteUser)
+
 			}
 
 			posts := auth.Group("/posts")
 			{
-				posts.GET("/", h.adminGetPosts)
-				posts.GET("/:id", h.adminGetPostById)
+				posts.GET("/", h.adminGetPosts)               // FIXME: DELETE (USELESS)
+				posts.GET("/:id", h.adminGetPostById)         // FIXME: DELETE (USELESS)
+				posts.GET("/:id/comments", h.getPostComments) // FIXME: DELETE (USELESS)
+
+				// TODO: posts.POST("/:id/comments", h.adminPostComment)
 				posts.POST("/:id/suspend", h.adminSuspendPost)
+				posts.POST("/:id/comments/:cid/censor", h.adminCensorPostComment)
+
 				posts.PUT("/:id", h.adminAlterPost)
+
 				posts.DELETE("/:id", h.adminDeletePost)
+				posts.DELETE("/:id/comments/:cid", h.deletePostComment)
+
 			}
 		}
 	}
+}
+
+func (h *Handler) adminGetUserPosts(c *gin.Context) {
+	userId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newResponse(c, http.StatusBadRequest, err.Error())
+
+		return
+	}
+
+	posts, err := h.services.Posts.GetAllUser(c.Request.Context(), uint(userId))
+	if err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+
+		return
+	}
+
+	c.JSON(http.StatusOK, dataResponse{
+		Data: posts,
+	})
+}
+
+func (h *Handler) adminGetUserComments(c *gin.Context) {
+	userId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newResponse(c, http.StatusBadRequest, err.Error())
+
+		return
+	}
+
+	comments, err := h.services.Comments.GetUserComments(c.Request.Context(), uint(userId))
+	if err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+
+		return
+	}
+
+	c.JSON(http.StatusOK, dataResponse{
+		Data: comments,
+	})
 }
 
 func (h *Handler) adminSignIn(c *gin.Context) {
@@ -247,6 +301,7 @@ func (h *Handler) adminDeletePost(c *gin.Context) {
 		Message: "deleted",
 	})
 }
+
 func (h *Handler) adminSuspendPost(c *gin.Context) {
 	postId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -261,5 +316,57 @@ func (h *Handler) adminSuspendPost(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response{
 		Message: "suspended",
+	})
+}
+
+func (h *Handler) adminCensorPostComment(c *gin.Context) {
+	postId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newResponse(c, http.StatusBadRequest, err.Error())
+
+		return
+	}
+
+	commId, err := strconv.Atoi(c.Param("cid"))
+	if err != nil {
+		newResponse(c, http.StatusBadRequest, err.Error())
+
+		return
+	}
+
+	if err := h.services.Admins.CensorComment(c.Request.Context(), uint(postId), uint(commId)); err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+
+		return
+	}
+
+	c.JSON(http.StatusOK, response{
+		Message: "censored",
+	})
+}
+
+func (h *Handler) deletePostComment(c *gin.Context) {
+	postId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newResponse(c, http.StatusBadRequest, err.Error())
+
+		return
+	}
+
+	commId, err := strconv.Atoi(c.Param("cid"))
+	if err != nil {
+		newResponse(c, http.StatusBadRequest, err.Error())
+
+		return
+	}
+
+	if err := h.services.Comments.Delete(c.Request.Context(), uint(postId), uint(commId)); err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+
+		return
+	}
+
+	c.JSON(http.StatusOK, response{
+		Message: "deleted",
 	})
 }

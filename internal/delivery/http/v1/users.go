@@ -20,13 +20,21 @@ func (h *Handler) initUsersRoutes(api *gin.RouterGroup) {
 			posts := auth.Group("/posts")
 			{
 				posts.GET("/", h.getUserPosts)
-				posts.POST("/", h.createUserPost)
-				posts.GET("/:id", h.getUserPostById)
-				posts.PUT("/:id", h.updateUserPost)
-				posts.DELETE("/:id", h.deleteUserPost)
+				posts.GET("/:id", h.getUserPostById) // FIXME: DELETE (USELESS) ??
+				posts.GET("/:id/comments", h.getUserPostComments)
 
-				posts.GET("/:id/comments", h.getPostComments) // implemented in posts.go
+				posts.POST("/", h.createUserPost)
 				posts.POST("/:id/comments", h.createPostComment)
+
+				posts.PUT("/:id", h.updateUserPost)
+
+				posts.DELETE("/:id", h.deleteUserPost)
+				// posts.DELETE("/:id/comments/:cid") // TODO: do so user can delete his own comments
+			}
+
+			comments := auth.Group("/comments")
+			{
+				comments.GET("/", h.getUserComments)
 			}
 		}
 	}
@@ -271,5 +279,52 @@ func (h *Handler) createPostComment(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response{
 		Message: "created",
+	})
+}
+
+func (h *Handler) getUserPostComments(c *gin.Context) {
+	userId, err := h.getUserId(c)
+	if err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+
+		return
+	}
+
+	postId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newResponse(c, http.StatusBadRequest, err.Error())
+
+		return
+	}
+
+	comments, err := h.services.Comments.GetUserPostComments(c.Request.Context(), userId, uint(postId))
+	if err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+
+		return
+	}
+
+	c.JSON(http.StatusOK, dataResponse{
+		Data: comments,
+	})
+}
+
+func (h *Handler) getUserComments(c *gin.Context) {
+	userId, err := h.getUserId(c)
+	if err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+
+		return
+	}
+
+	comments, err := h.services.Comments.GetUserComments(c.Request.Context(), userId)
+	if err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+
+		return
+	}
+
+	c.JSON(http.StatusOK, dataResponse{
+		Data: comments,
 	})
 }

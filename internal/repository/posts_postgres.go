@@ -41,8 +41,6 @@ func (r *PostsRepo) Create(ctx context.Context, input domain.Post, userId uint) 
 }
 
 func (r *PostsRepo) GetAll(ctx context.Context) ([]domain.Post, error) {
-	var posts []domain.Post
-
 	query := fmt.Sprintf("SELECT id, title, description, author, suspended, comments, created, updated, likes, watched FROM %s", posts_table)
 
 	rows, err := r.db.Query(ctx, query)
@@ -50,6 +48,7 @@ func (r *PostsRepo) GetAll(ctx context.Context) ([]domain.Post, error) {
 		return []domain.Post{}, err
 	}
 
+	var posts []domain.Post
 	posts, err = pgx.CollectRows(rows, pgx.RowToStructByName[domain.Post])
 	if err != nil {
 		return []domain.Post{}, err

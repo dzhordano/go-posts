@@ -25,8 +25,11 @@ type (
 
 		UpdateUser(ctx context.Context, input domain.UpdateUserInput, userId uint) error
 		DeleteUser(ctx context.Context, userId uint) error
+
 		SuspendUser(ctx context.Context, userId uint) error
 		SuspendPost(ctx context.Context, postId uint) error
+
+		CensorComment(ctx context.Context, postId, commId uint) error
 	}
 
 	Posts interface {
@@ -35,7 +38,7 @@ type (
 		GetById(ctx context.Context, postId uint) (domain.Post, error)
 		Update(ctx context.Context, input domain.UpdatePostInput, postId uint) error
 		Delete(ctx context.Context, postId uint) error
-		// TODO: do i need to keep those here (i think yes)
+
 		GetAllUser(ctx context.Context, userId uint) ([]domain.Post, error)
 		GetByIdUser(ctx context.Context, postId, userId uint) (domain.Post, error)
 		UpdateUser(ctx context.Context, input domain.UpdatePostInput, postId, userId uint) error
@@ -45,6 +48,10 @@ type (
 	Comments interface {
 		Create(ctx context.Context, input domain.Comment, postId uint) error
 		GetComments(ctx context.Context, postId uint) ([]domain.Comment, error)
+		Delete(ctx context.Context, postId, commId uint) error
+
+		GetUserComments(ctx context.Context, userId uint) ([]domain.Comment, error)
+		GetUserPostComments(ctx context.Context, userId, postId uint) ([]domain.Comment, error)
 	}
 )
 

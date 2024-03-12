@@ -100,3 +100,7 @@ func (s *AdminsService) SuspendUser(ctx context.Context, userId uint) error {
 func (s *AdminsService) SuspendPost(ctx context.Context, postId uint) error {
 	return s.repo.SuspendPost(ctx, postId)
 }
+
+func (s *AdminsService) CensorComment(ctx context.Context, postId, commId uint) error {
+	return s.repo.CensorComment(ctx, postId, commId)
+}
