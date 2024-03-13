@@ -20,32 +20,32 @@ func (h *Handler) initAdminsRoutes(api *gin.RouterGroup) {
 			{
 				users.GET("/", h.adminGetUsers)
 				users.GET("/:id", h.adminGetUserById)
-				users.GET("/:id/posts", h.adminGetUserPosts)       // implemented in v1/users.go
-				users.GET("/:id/comments", h.adminGetUserComments) // implemented in v1/users.go
+				users.GET("/:id/posts", h.adminGetUserPosts)       // TODO: USELESS ?
+				users.GET("/:id/comments", h.adminGetUserComments) // TODO: USELESS ?
 
 				users.POST("/:id/suspend", h.adminSuspendUser)
 
 				users.PUT("/:id", h.adminAlterUser)
 
 				users.DELETE("/:id", h.adminDeleteUser)
-
 			}
 
 			posts := auth.Group("/posts")
 			{
-				posts.GET("/", h.adminGetPosts)               // FIXME: DELETE (USELESS)
-				posts.GET("/:id", h.adminGetPostById)         // FIXME: DELETE (USELESS)
-				posts.GET("/:id/comments", h.getPostComments) // FIXME: DELETE (USELESS)
-
-				// TODO: posts.POST("/:id/comments", h.adminPostComment)
 				posts.POST("/:id/suspend", h.adminSuspendPost)
-				posts.POST("/:id/comments/:cid/censor", h.adminCensorPostComment)
 
 				posts.PUT("/:id", h.adminAlterPost)
 
 				posts.DELETE("/:id", h.adminDeletePost)
-				posts.DELETE("/:id/comments/:cid", h.deletePostComment)
+			}
 
+			comments := auth.Group("/comments")
+			{
+				comments.GET("/", h.adminGetComments)
+				comments.POST("/", h.adminCreateComment)
+				comments.PUT("/:id", h.adminUpdateComment)
+				comments.DELETE("/:id", h.adminDeleteComment) // FIXME: delete postId in necessities
+				comments.POST("/:id/censor", h.adminCensorComment)
 			}
 		}
 	}
@@ -226,39 +226,6 @@ func (h *Handler) adminSuspendUser(c *gin.Context) {
 	})
 }
 
-func (h *Handler) adminGetPosts(c *gin.Context) {
-	posts, err := h.services.Posts.GetAll(c.Request.Context())
-	if err != nil {
-		newResponse(c, http.StatusInternalServerError, err.Error())
-
-		return
-	}
-
-	c.JSON(http.StatusOK, dataResponse{
-		Data: posts,
-	})
-}
-
-func (h *Handler) adminGetPostById(c *gin.Context) {
-	postId, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		newResponse(c, http.StatusBadRequest, err.Error())
-
-		return
-	}
-
-	posts, err := h.services.Posts.GetById(c.Request.Context(), uint(postId))
-	if err != nil {
-		newResponse(c, http.StatusInternalServerError, err.Error())
-
-		return
-	}
-
-	c.JSON(http.StatusOK, dataResponse{
-		Data: posts,
-	})
-}
-
 func (h *Handler) adminAlterPost(c *gin.Context) {
 	var input domain.UpdatePostInput
 	if err := c.BindJSON(&input); err != nil {
@@ -319,14 +286,7 @@ func (h *Handler) adminSuspendPost(c *gin.Context) {
 	})
 }
 
-func (h *Handler) adminCensorPostComment(c *gin.Context) {
-	postId, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		newResponse(c, http.StatusBadRequest, err.Error())
-
-		return
-	}
-
+func (h *Handler) adminCensorComment(c *gin.Context) {
 	commId, err := strconv.Atoi(c.Param("cid"))
 	if err != nil {
 		newResponse(c, http.StatusBadRequest, err.Error())
@@ -334,7 +294,7 @@ func (h *Handler) adminCensorPostComment(c *gin.Context) {
 		return
 	}
 
-	if err := h.services.Admins.CensorComment(c.Request.Context(), uint(postId), uint(commId)); err != nil {
+	if err := h.services.Admins.CensorComment(c.Request.Context(), uint(commId)); err != nil {
 		newResponse(c, http.StatusInternalServerError, err.Error())
 
 		return
@@ -345,22 +305,15 @@ func (h *Handler) adminCensorPostComment(c *gin.Context) {
 	})
 }
 
-func (h *Handler) deletePostComment(c *gin.Context) {
-	postId, err := strconv.Atoi(c.Param("id"))
+func (h *Handler) adminDeleteComment(c *gin.Context) {
+	commId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		newResponse(c, http.StatusBadRequest, err.Error())
 
 		return
 	}
 
-	commId, err := strconv.Atoi(c.Param("cid"))
-	if err != nil {
-		newResponse(c, http.StatusBadRequest, err.Error())
-
-		return
-	}
-
-	if err := h.services.Comments.Delete(c.Request.Context(), uint(postId), uint(commId)); err != nil {
+	if err := h.services.Admins.DeleteComment(c.Request.Context(), uint(commId)); err != nil {
 		newResponse(c, http.StatusInternalServerError, err.Error())
 
 		return
@@ -369,4 +322,17 @@ func (h *Handler) deletePostComment(c *gin.Context) {
 	c.JSON(http.StatusOK, response{
 		Message: "deleted",
 	})
+}
+
+// TODO: implement...
+func (h *Handler) adminGetComments(c *gin.Context) {
+	panic("TODO")
+}
+
+func (h *Handler) adminCreateComment(c *gin.Context) {
+	panic("TODO")
+}
+
+func (h *Handler) adminUpdateComment(c *gin.Context) {
+	panic("TODO")
 }

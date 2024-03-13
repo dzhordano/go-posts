@@ -20,21 +20,19 @@ func (h *Handler) initUsersRoutes(api *gin.RouterGroup) {
 			posts := auth.Group("/posts")
 			{
 				posts.GET("/", h.getUserPosts)
-				posts.GET("/:id", h.getUserPostById) // FIXME: DELETE (USELESS) ??
-				posts.GET("/:id/comments", h.getUserPostComments)
-
 				posts.POST("/", h.createUserPost)
-				posts.POST("/:id/comments", h.createPostComment)
-
 				posts.PUT("/:id", h.updateUserPost)
-
 				posts.DELETE("/:id", h.deleteUserPost)
-				// posts.DELETE("/:id/comments/:cid") // TODO: do so user can delete his own comments
+
+				posts.GET("/:id/comments", h.getUserPostComments)
+				posts.POST("/:id/comment", h.createPostComment) // TODO: left this there or move to /comments ?
 			}
 
 			comments := auth.Group("/comments")
 			{
 				comments.GET("/", h.getUserComments)
+				comments.PUT("/:id", h.updateUserComment)
+				comments.DELETE("/:id", h.deleteUserComment)
 			}
 		}
 	}
@@ -122,33 +120,6 @@ func (h *Handler) getUserPosts(c *gin.Context) {
 
 	c.JSON(http.StatusOK, dataResponse{
 		Data: posts,
-	})
-}
-
-func (h *Handler) getUserPostById(c *gin.Context) {
-	postId, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		newResponse(c, http.StatusBadRequest, err.Error())
-
-		return
-	}
-
-	userId, err := h.getUserId(c)
-	if err != nil {
-		newResponse(c, http.StatusInternalServerError, err.Error())
-
-		return
-	}
-
-	post, err := h.services.Posts.GetByIdUser(c.Request.Context(), uint(postId), userId)
-	if err != nil {
-		newResponse(c, http.StatusInternalServerError, err.Error())
-
-		return
-	}
-
-	c.JSON(http.StatusOK, dataResponse{
-		Data: post,
 	})
 }
 
@@ -326,5 +297,64 @@ func (h *Handler) getUserComments(c *gin.Context) {
 
 	c.JSON(http.StatusOK, dataResponse{
 		Data: comments,
+	})
+}
+
+func (h *Handler) updateUserComment(c *gin.Context) {
+	var input domain.UpdateCommentInput
+	if err := c.BindJSON(&input); err != nil {
+		newResponse(c, http.StatusBadRequest, err.Error())
+
+		return
+	}
+
+	userId, err := h.getUserId(c)
+	if err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+
+		return
+	}
+
+	commentId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newResponse(c, http.StatusBadRequest, err.Error())
+
+		return
+	}
+
+	if err := h.services.Comments.UpdateUser(c.Request.Context(), input, uint(commentId), userId); err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+
+		return
+	}
+
+	c.JSON(http.StatusOK, response{
+		Message: "updated",
+	})
+}
+
+func (h *Handler) deleteUserComment(c *gin.Context) {
+	commentId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newResponse(c, http.StatusBadRequest, err.Error())
+
+		return
+	}
+
+	userId, err := h.getUserId(c)
+	if err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+
+		return
+	}
+
+	if err := h.services.Comments.DeleteUser(c.Request.Context(), uint(commentId), userId); err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+
+		return
+	}
+
+	c.JSON(http.StatusOK, response{
+		Message: "deleted",
 	})
 }

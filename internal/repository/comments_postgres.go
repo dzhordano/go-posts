@@ -53,17 +53,27 @@ func (r *CommentsRepo) GetComments(ctx context.Context, postId uint) ([]domain.C
 	return comments, nil
 }
 
-func (r *CommentsRepo) Delete(ctx context.Context, postId, commId uint) error {
-	qCommentsTable := fmt.Sprintf("DELETE FROM %s WHERE post_id = $1 AND id = $2", comments_table)
+func (r *CommentsRepo) UpdateUser(ctx context.Context, input domain.UpdateCommentInput, commId, userId uint) error {
+	query := fmt.Sprintf("UPDATE %s SET data = $1, updated = $2 WHERE id = $3 AND author_id = $4", comments_table)
 
-	_, err := r.db.Exec(ctx, qCommentsTable, postId, commId)
-	if err != nil {
+	_, err := r.db.Exec(ctx, query, input.Data, time.Now(), commId, userId)
+
+	return err
+}
+
+func (r *CommentsRepo) DeleteUser(ctx context.Context, commId, userId uint) error {
+	qCommentsTable := fmt.Sprintf("DELETE FROM %s WHERE id = $1 AND author_id = $2 RETURNING post_id", comments_table)
+
+	var postId int
+	row := r.db.QueryRow(ctx, qCommentsTable, commId, userId)
+
+	if err := row.Scan(&postId); err != nil {
 		return err
 	}
 
 	qPostsTable := fmt.Sprintf("UPDATE %s SET comments = comments - 1 WHERE id = $1", posts_table)
 
-	_, err = r.db.Exec(ctx, qPostsTable, postId)
+	_, err := r.db.Exec(ctx, qPostsTable, postId)
 
 	return err
 }

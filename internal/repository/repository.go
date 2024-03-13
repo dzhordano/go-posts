@@ -36,7 +36,8 @@ type (
 		DeleteUser(ctx context.Context, userId uint) error
 		SuspendUser(ctx context.Context, userId uint) error
 		SuspendPost(ctx context.Context, postId uint) error
-		CensorComment(ctx context.Context, postId, commId uint) error
+		CensorComment(ctx context.Context, commId uint) error
+		DeleteComment(ctx context.Context, commId uint) error
 	}
 
 	Posts interface {
@@ -55,8 +56,9 @@ type (
 	Comments interface {
 		Create(ctx context.Context, input domain.Comment, postId uint) error
 		GetComments(ctx context.Context, postId uint) ([]domain.Comment, error)
-		Delete(ctx context.Context, postId, commId uint) error
 
+		UpdateUser(ctx context.Context, input domain.UpdateCommentInput, commId, userId uint) error
+		DeleteUser(ctx context.Context, commId, userId uint) error
 		GetUserComments(ctx context.Context, userId uint) ([]domain.Comment, error)
 		GetUserPostComments(ctx context.Context, userId, postId uint) ([]domain.Comment, error)
 	}

@@ -5,16 +5,15 @@ import (
 	"time"
 )
 
-// FIXME: change createdAt -> created and updatedAt -> updated
 type Post struct {
 	ID          uint      `json:"id"`
-	Title       string    `json:"title" binding:"required"`
-	Description string    `json:"description"  binding:"required"`
+	Title       string    `json:"title" binding:"required,min=1"`
+	Description string    `json:"description" binding:"required,min=1"`
 	Author      string    `json:"author"`
 	Suspended   bool      `json:"suspended"`
 	Comments    int       `json:"comments"`
-	CreatedAt   time.Time `json:"createdAt" db:"created"`
-	UpdatedAt   time.Time `json:"updatedAt" db:"updated"`
+	Created     time.Time `json:"created"`
+	Updated     time.Time `json:"updated"`
 	Likes       uint      `json:"likes"`
 	Watched     uint      `json:"watched"`
 }
@@ -23,7 +22,7 @@ type Comment struct {
 	ID       uint      `json:"id"`
 	PostId   uint      `json:"post_id"`
 	AuthorId uint      `json:"author_id"`
-	Data     string    `json:"data" binding:"required"`
+	Data     string    `json:"data" binding:"required,min=1"`
 	Created  time.Time `json:"commented_at"`
 	Updated  time.Time `json:"updated_at"`
 	Censored bool      `json:"censored"`
@@ -40,4 +39,8 @@ func (i UpdatePostInput) Validate() error {
 	}
 
 	return nil
+}
+
+type UpdateCommentInput struct {
+	Data string `json:"data" binding:"required,min=1"`
 }

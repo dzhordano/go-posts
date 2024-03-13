@@ -25,8 +25,12 @@ func (s *CommentsService) GetComments(ctx context.Context, postId uint) ([]domai
 	return s.repo.GetComments(ctx, postId)
 }
 
-func (s *CommentsService) Delete(ctx context.Context, postId, commId uint) error {
-	return s.repo.Delete(ctx, postId, commId)
+func (s *CommentsService) UpdateUser(ctx context.Context, input domain.UpdateCommentInput, commId, userId uint) error {
+	return s.repo.UpdateUser(ctx, input, commId, userId)
+}
+
+func (s *CommentsService) DeleteUser(ctx context.Context, commId, userId uint) error {
+	return s.repo.DeleteUser(ctx, commId, userId)
 }
 
 func (s *CommentsService) GetUserPostComments(ctx context.Context, userId, postId uint) ([]domain.Comment, error) {

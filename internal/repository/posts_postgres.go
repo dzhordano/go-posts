@@ -65,7 +65,7 @@ func (r *PostsRepo) GetById(ctx context.Context, postId uint) (domain.Post, erro
 	row := r.db.QueryRow(ctx, query, postId)
 
 	// TODO: do i need to set session values?
-	err := row.Scan(&post.ID, &post.Title, &post.Description, &post.Author, &post.Suspended, &post.Comments, &post.CreatedAt, &post.UpdatedAt, &post.Likes, &post.Watched)
+	err := row.Scan(&post.ID, &post.Title, &post.Description, &post.Author, &post.Suspended, &post.Comments, &post.Created, &post.Updated, &post.Likes, &post.Watched)
 	if err != nil {
 		return domain.Post{}, err
 	}
@@ -135,7 +135,7 @@ func (r *PostsRepo) GetByIdUser(ctx context.Context, postId, userId uint) (domai
 	row := r.db.QueryRow(ctx, query, postId, userId)
 
 	// TODO: do i need to set session values?
-	err := row.Scan(&post.ID, &post.Title, &post.Description, &post.Author, &post.Suspended, &post.Comments, &post.CreatedAt, &post.UpdatedAt, &post.Likes, &post.Watched)
+	err := row.Scan(&post.ID, &post.Title, &post.Description, &post.Author, &post.Suspended, &post.Comments, &post.Created, &post.Updated, &post.Likes, &post.Watched)
 	if err != nil {
 		return domain.Post{}, err
 	}

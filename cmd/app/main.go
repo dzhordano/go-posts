@@ -17,10 +17,8 @@ import (
 // configs dir path
 var cfgPath = "configs"
 
+// TODO: исправить все (почти все) FIXME + добавить методы админу: создать коммент (свой), изменить + удалить. Добавить изменение + удаление комментов юзеру (своих).
 // TODAY: простой фронт с HTMX
-// NEXT: следующим надо внедрить комментарии к посту и дать проработать их удаление или изменение, также сделать suspend (затем добавить все админу, чтобы он мог управлять и коммами)
-// чтобы такие комменты заменялись на "suspended"
-// Redis: после всего надо подумать что кэшировать (посты, мб токены, или ???)
 
 func main() {
 	// load cfg from env and yaml
@@ -51,9 +49,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to init db: %v", err)
 	}
+	defer pgclient.Close() // FIXME: this there?
 
 	// Init repositories
-	// FIXME: dont forget to put pgxpool.Close() after graceful shutdown or somewhere where it belongs
 	repos := repository.NewRepos(pgclient)
 
 	// Init services

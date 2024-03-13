@@ -142,10 +142,27 @@ func (r *AdminsRepo) SuspendPost(ctx context.Context, postId uint) error {
 	return err
 }
 
-func (r *AdminsRepo) CensorComment(ctx context.Context, postId, commId uint) error {
+func (r *AdminsRepo) CensorComment(ctx context.Context, commId uint) error {
 	query := fmt.Sprintf("UPDATE %s SET censored = TRUE WHERE post_id = $1 AND id = $2", comments_table)
 
-	_, err := r.db.Exec(ctx, query, postId, commId)
+	_, err := r.db.Exec(ctx, query, commId)
+
+	return err
+}
+
+func (r *AdminsRepo) DeleteComment(ctx context.Context, commId uint) error {
+	qCommentsTable := fmt.Sprintf("DELETE FROM %s WHERE id = $1 RETURNING post_id", comments_table)
+
+	var postId int
+	row := r.db.QueryRow(ctx, qCommentsTable, commId)
+
+	if err := row.Scan(&postId); err != nil {
+		return err
+	}
+
+	qPostsTable := fmt.Sprintf("UPDATE %s SET comments = comments - 1 WHERE id = $1", posts_table)
+
+	_, err := r.db.Exec(ctx, qPostsTable, postId)
 
 	return err
 }

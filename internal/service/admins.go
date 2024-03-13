@@ -101,6 +101,10 @@ func (s *AdminsService) SuspendPost(ctx context.Context, postId uint) error {
 	return s.repo.SuspendPost(ctx, postId)
 }
 
-func (s *AdminsService) CensorComment(ctx context.Context, postId, commId uint) error {
-	return s.repo.CensorComment(ctx, postId, commId)
+func (s *AdminsService) CensorComment(ctx context.Context, commId uint) error {
+	return s.repo.CensorComment(ctx, commId)
+}
+
+func (s *AdminsService) DeleteComment(ctx context.Context, commId uint) error {
+	return s.repo.DeleteComment(ctx, commId)
 }
