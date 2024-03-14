@@ -17,9 +17,6 @@ import (
 // configs dir path
 var cfgPath = "configs"
 
-// TODO: исправить все (почти все) FIXME + добавить методы админу: создать коммент (свой), изменить + удалить. Добавить изменение + удаление комментов юзеру (своих).
-// TODAY: простой фронт с HTMX
-
 func main() {
 	// load cfg from env and yaml
 	cfg, err := config.MustLoad(cfgPath)
@@ -49,7 +46,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to init db: %v", err)
 	}
-	defer pgclient.Close() // FIXME: this there?
+	defer pgclient.Close()
 
 	// Init repositories
 	repos := repository.NewRepos(pgclient)

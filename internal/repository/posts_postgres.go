@@ -41,7 +41,7 @@ func (r *PostsRepo) Create(ctx context.Context, input domain.Post, userId uint) 
 }
 
 func (r *PostsRepo) GetAll(ctx context.Context) ([]domain.Post, error) {
-	query := fmt.Sprintf("SELECT id, title, description, author, suspended, comments, created, updated, likes, watched FROM %s", posts_table)
+	query := fmt.Sprintf("UPDATE %s SET watched = watched + 1 RETURNING *", posts_table)
 
 	rows, err := r.db.Query(ctx, query)
 	if err != nil {
@@ -60,12 +60,12 @@ func (r *PostsRepo) GetAll(ctx context.Context) ([]domain.Post, error) {
 func (r *PostsRepo) GetById(ctx context.Context, postId uint) (domain.Post, error) {
 	var post domain.Post
 
-	query := fmt.Sprintf("SELECT id, title, description, author, suspended, comments, created, updated, likes, watched FROM %s WHERE id = $1", posts_table)
+	query := fmt.Sprintf("UPDATE %s SET watched = watched + 1 WHERE id = $1 RETURNING *", posts_table)
 
 	row := r.db.QueryRow(ctx, query, postId)
 
 	// TODO: do i need to set session values?
-	err := row.Scan(&post.ID, &post.Title, &post.Description, &post.Author, &post.Suspended, &post.Comments, &post.Created, &post.Updated, &post.Likes, &post.Watched)
+	err := row.Scan(&post.ID, &post.Title, &post.Description, &post.Author, &post.Comments, &post.Suspended, &post.Created, &post.Updated, &post.Likes, &post.Watched)
 	if err != nil {
 		return domain.Post{}, err
 	}
@@ -127,22 +127,6 @@ func (r *PostsRepo) GetAllUser(ctx context.Context, userId uint) ([]domain.Post,
 	return posts, nil
 }
 
-func (r *PostsRepo) GetByIdUser(ctx context.Context, postId, userId uint) (domain.Post, error) {
-	var post domain.Post
-
-	query := fmt.Sprintf("SELECT p.id, p.title, p.description, p.author, p.suspended, p.comments, p.created, p.updated, p.likes, p.watched FROM %s p INNER JOIN %s up ON p.id = up.post_id WHERE p.id = $1 AND up.user_id = $2", posts_table, users_posts)
-
-	row := r.db.QueryRow(ctx, query, postId, userId)
-
-	// TODO: do i need to set session values?
-	err := row.Scan(&post.ID, &post.Title, &post.Description, &post.Author, &post.Suspended, &post.Comments, &post.Created, &post.Updated, &post.Likes, &post.Watched)
-	if err != nil {
-		return domain.Post{}, err
-	}
-
-	return post, nil
-}
-
 func (r *PostsRepo) UpdateUser(ctx context.Context, input domain.UpdatePostInput, postId, userId uint) error {
 	setValues := make([]string, 0)
 	args := make([]interface{}, 0)
@@ -176,6 +160,22 @@ func (r *PostsRepo) DeleteUser(ctx context.Context, postId, userId uint) error {
 	query := fmt.Sprintf("DELETE FROM %s p USING %s up WHERE p.id = up.post_id AND up.post_id = $1 AND up.user_id = $2", posts_table, users_posts)
 
 	_, err := r.db.Exec(ctx, query, postId, userId)
+
+	return err
+}
+
+func (r *PostsRepo) Like(ctx context.Context, postId uint) error {
+	query := fmt.Sprintf("UPDATE %s SET likes = likes + 1 WHERE id = $1", posts_table)
+
+	_, err := r.db.Exec(ctx, query, postId)
+
+	return err
+}
+
+func (r *PostsRepo) RemoveLike(ctx context.Context, postId uint) error {
+	query := fmt.Sprintf("UPDATE %s SET likes = likes - 1 WHERE id = $1", posts_table)
+
+	_, err := r.db.Exec(ctx, query, postId)
 
 	return err
 }

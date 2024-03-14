@@ -25,7 +25,11 @@ func (h *Handler) initUsersRoutes(api *gin.RouterGroup) {
 				posts.DELETE("/:id", h.deleteUserPost)
 
 				posts.GET("/:id/comments", h.getUserPostComments)
-				posts.POST("/:id/comment", h.createPostComment) // TODO: left this there or move to /comments ?
+				posts.POST("/:id/comment", h.createPostComment)
+
+				posts.POST("/:id/like", h.userLikePost)
+				posts.POST("/:id/unlike", h.userRemoveLike)
+				// posts.POST("/:id/react", h.userReactPost) TODO: later...
 			}
 
 			comments := auth.Group("/comments")
@@ -358,3 +362,46 @@ func (h *Handler) deleteUserComment(c *gin.Context) {
 		Message: "deleted",
 	})
 }
+
+func (h *Handler) userLikePost(c *gin.Context) {
+	postId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newResponse(c, http.StatusBadRequest, err.Error())
+
+		return
+	}
+
+	if err := h.services.Posts.Like(c.Request.Context(), uint(postId)); err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+
+		return
+	}
+
+	c.JSON(http.StatusOK, response{
+		Message: "success",
+	})
+}
+
+func (h *Handler) userRemoveLike(c *gin.Context) {
+	postId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newResponse(c, http.StatusBadRequest, err.Error())
+
+		return
+	}
+
+	if err := h.services.Posts.RemoveLike(c.Request.Context(), uint(postId)); err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+
+		return
+	}
+
+	c.JSON(http.StatusOK, response{
+		Message: "success",
+	})
+}
+
+// TODO: later...
+// func (h *Handler) userReactPost(c *gin.Context) {
+// 	panic("TODO")
+// }

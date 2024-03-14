@@ -34,16 +34,17 @@ type (
 	}
 
 	Posts interface {
-		Create(ctx context.Context, input domain.Post, userId uint) error
 		GetAll(ctx context.Context) ([]domain.Post, error)
 		GetById(ctx context.Context, postId uint) (domain.Post, error)
 		Update(ctx context.Context, input domain.UpdatePostInput, postId uint) error
 		Delete(ctx context.Context, postId uint) error
 
+		Create(ctx context.Context, input domain.Post, userId uint) error
 		GetAllUser(ctx context.Context, userId uint) ([]domain.Post, error)
-		GetByIdUser(ctx context.Context, postId, userId uint) (domain.Post, error)
 		UpdateUser(ctx context.Context, input domain.UpdatePostInput, postId, userId uint) error
 		DeleteUser(ctx context.Context, postId, userId uint) error
+		Like(ctx context.Context, postId uint) error
+		RemoveLike(ctx context.Context, postId uint) error
 	}
 
 	Comments interface {

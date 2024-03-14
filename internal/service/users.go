@@ -63,7 +63,6 @@ func (s *UsersService) SignUP(ctx context.Context, input domain.UserSignUpInput)
 }
 
 func (s *UsersService) SignIN(ctx context.Context, input domain.UserSignInInput) (Tokens, error) {
-	// TODO: and also return tokens, not id
 	passwordHash, err := s.hasher.GeneratePasswordHash(input.Password)
 	if err != nil {
 		return Tokens{}, err

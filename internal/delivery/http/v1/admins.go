@@ -20,8 +20,8 @@ func (h *Handler) initAdminsRoutes(api *gin.RouterGroup) {
 			{
 				users.GET("/", h.adminGetUsers)
 				users.GET("/:id", h.adminGetUserById)
-				users.GET("/:id/posts", h.adminGetUserPosts)       // TODO: USELESS ?
-				users.GET("/:id/comments", h.adminGetUserComments) // TODO: USELESS ?
+				users.GET("/:id/posts", h.adminGetUserPosts)
+				users.GET("/:id/comments", h.adminGetUserComments)
 
 				users.POST("/:id/suspend", h.adminSuspendUser)
 
@@ -44,7 +44,7 @@ func (h *Handler) initAdminsRoutes(api *gin.RouterGroup) {
 				comments.GET("/", h.adminGetComments)
 				comments.POST("/", h.adminCreateComment)
 				comments.PUT("/:id", h.adminUpdateComment)
-				comments.DELETE("/:id", h.adminDeleteComment) // FIXME: delete postId in necessities
+				comments.DELETE("/:id", h.adminDeleteComment)
 				comments.POST("/:id/censor", h.adminCensorComment)
 			}
 		}

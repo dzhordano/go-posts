@@ -14,7 +14,6 @@ func (h *Handler) initPostsRoutes(api *gin.RouterGroup) {
 		posts.GET("/:id", h.getPostById)
 
 		posts.GET("/:id/comments", h.getPostComments)
-
 	}
 }
 

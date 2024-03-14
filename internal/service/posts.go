@@ -48,10 +48,6 @@ func (s *PostsService) GetAllUser(ctx context.Context, userId uint) ([]domain.Po
 	return s.repo.GetAllUser(ctx, userId)
 }
 
-func (s *PostsService) GetByIdUser(ctx context.Context, postId, userId uint) (domain.Post, error) {
-	return s.repo.GetByIdUser(ctx, postId, userId)
-}
-
 func (s *PostsService) DeleteUser(ctx context.Context, postId, userId uint) error {
 	return s.repo.DeleteUser(ctx, postId, userId)
 }
@@ -62,4 +58,12 @@ func (s *PostsService) UpdateUser(ctx context.Context, input domain.UpdatePostIn
 	}
 
 	return s.repo.UpdateUser(ctx, input, postId, userId)
+}
+
+func (s *PostsService) Like(ctx context.Context, postId uint) error {
+	return s.repo.Like(ctx, postId)
+}
+
+func (s *PostsService) RemoveLike(ctx context.Context, postId uint) error {
+	return s.repo.RemoveLike(ctx, postId)
 }
