@@ -10,6 +10,8 @@ import (
 	"github.com/dzhordano/go-posts/pkg/hasher"
 )
 
+//go:generate mockgen -source=service.go -destination=mocks/mock.go
+
 type (
 	Users interface {
 		SignUP(ctx context.Context, input domain.UserSignUpInput) error
