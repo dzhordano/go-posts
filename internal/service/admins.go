@@ -35,14 +35,14 @@ func NewAdminsService(repo repository.Admins, hasher hasher.PassworsHasher, toke
 	}
 }
 
-func (s *AdminsService) SignIN(ctx context.Context, input domain.UserSignInInput) (Tokens, error) {
+func (s *AdminsService) SignIN(ctx context.Context, input UserSignInInput) (Tokens, error) {
 	passwordHash, err := s.hasher.GeneratePasswordHash(input.Password)
 	if err != nil {
 		return Tokens{}, err
 	}
 	input.Password = passwordHash
 
-	admin, err := s.repo.GetByCredentials(ctx, input)
+	admin, err := s.repo.GetByCredentials(ctx, input.Email, input.Password)
 	if err != nil {
 		return Tokens{}, err
 	}

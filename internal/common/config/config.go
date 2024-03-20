@@ -9,6 +9,11 @@ import (
 	"github.com/spf13/viper"
 )
 
+const (
+	EnvLocal = "local"
+	Prod     = "prod"
+)
+
 type (
 	Config struct {
 		Env  string `yaml:"env" env-default:"local"`

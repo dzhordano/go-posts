@@ -36,7 +36,7 @@ func NewUsersService(repo repository.Users, hasher hasher.PassworsHasher, tokenM
 	}
 }
 
-func (s *UsersService) SignUP(ctx context.Context, input domain.UserSignUpInput) error {
+func (s *UsersService) SignUP(ctx context.Context, input UserSignUpInput) error {
 	passwordHash, err := s.hasher.GeneratePasswordHash(input.Password)
 	if err != nil {
 		return err
@@ -62,14 +62,14 @@ func (s *UsersService) SignUP(ctx context.Context, input domain.UserSignUpInput)
 	return s.repo.Create(ctx, user)
 }
 
-func (s *UsersService) SignIN(ctx context.Context, input domain.UserSignInInput) (Tokens, error) {
+func (s *UsersService) SignIN(ctx context.Context, input UserSignInInput) (Tokens, error) {
 	passwordHash, err := s.hasher.GeneratePasswordHash(input.Password)
 	if err != nil {
 		return Tokens{}, err
 	}
 	input.Password = passwordHash
 
-	user, err := s.repo.GetByCredentials(ctx, input)
+	user, err := s.repo.GetByCredentials(ctx, input.Email, input.Password)
 	if err != nil {
 		return Tokens{}, err
 	}

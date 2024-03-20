@@ -22,17 +22,6 @@ type Verification struct {
 	Verified bool   `json:"verificatio_verified"`
 }
 
-type UserSignUpInput struct {
-	Name     string `json:"name" binding:"required,min=2,max=64"`
-	Email    string `json:"email" binding:"required,email,max=64"`
-	Password string `json:"password" binding:"required,min=8,max=64"`
-}
-
-type UserSignInInput struct {
-	Email    string `json:"email" binding:"required,email,max=64"`
-	Password string `json:"password" binding:"required,min=8,max=64"`
-}
-
 type UpdateUserInput struct {
 	Name     *string
 	Password *string

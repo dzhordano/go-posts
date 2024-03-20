@@ -28,10 +28,10 @@ func (r *UsersRepo) Create(ctx context.Context, user domain.User) error {
 	return err
 }
 
-func (r *UsersRepo) GetByCredentials(ctx context.Context, input domain.UserSignInInput) (domain.User, error) {
+func (r *UsersRepo) GetByCredentials(ctx context.Context, email, password string) (domain.User, error) {
 	query := fmt.Sprintf("SELECT id, name, email, password, (verification).code, (verification).verified, suspended, registered, lastonline FROM %s WHERE email = $1 AND password = $2", users_table)
 
-	row := r.db.QueryRow(ctx, query, input.Email, input.Password)
+	row := r.db.QueryRow(ctx, query, email, password)
 
 	var user domain.User
 
@@ -59,7 +59,7 @@ func (r *UsersRepo) GetByRefreshToken(ctx context.Context, refreshToken string) 
 
 	var user domain.User
 
-	err := row.Scan(&user)
+	err := row.Scan(&user.ID)
 	if err != nil {
 		return domain.User{}, err
 	}

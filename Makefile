@@ -11,3 +11,5 @@ up:
 # DROP TABLES
 down:
 	@migrate -path ./migrations -database 'postgres://postgres:qwerty@localhost:5433/postgres?sslmode=disable' down
+
+# swag init --parseInternal --dir cmd/app/,internal/delivery/http/v1 --output /docs/

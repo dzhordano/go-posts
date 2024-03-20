@@ -14,15 +14,26 @@ import (
 
 type (
 	Users interface {
-		SignUP(ctx context.Context, input domain.UserSignUpInput) error
-		SignIN(ctx context.Context, input domain.UserSignInInput) (Tokens, error)
+		SignUP(ctx context.Context, input UserSignUpInput) error
+		SignIN(ctx context.Context, input UserSignInInput) (Tokens, error)
 		RefreshTokens(ctx context.Context, refreshToken string) (Tokens, error)
 		GetAll(ctx context.Context) ([]domain.User, error)
 		GetById(ctx context.Context, userId uint) (domain.User, error)
 	}
 
+	UserSignUpInput struct {
+		Name     string `json:"name" binding:"required,min=2,max=64"`
+		Email    string `json:"email" binding:"required,email,max=64"`
+		Password string `json:"password" binding:"required,min=8,max=64"`
+	}
+
+	UserSignInInput struct {
+		Email    string `json:"email" binding:"required,email,max=64"`
+		Password string `json:"password" binding:"required,min=8,max=64"`
+	}
+
 	Admins interface {
-		SignIN(ctx context.Context, input domain.UserSignInInput) (Tokens, error)
+		SignIN(ctx context.Context, input UserSignInInput) (Tokens, error)
 		RefreshTokens(ctx context.Context, refreshToken string) (Tokens, error)
 
 		UpdateUser(ctx context.Context, input domain.UpdateUserInput, userId uint) error

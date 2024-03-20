@@ -21,14 +21,14 @@ type (
 		Create(ctx context.Context, user domain.User) error
 		GetAll(ctx context.Context) ([]domain.User, error)
 		GetById(ctx context.Context, userId uint) (domain.User, error)
-		GetByCredentials(ctx context.Context, input domain.UserSignInInput) (domain.User, error)
+		GetByCredentials(ctx context.Context, email, password string) (domain.User, error)
 		CreateSession(ctx context.Context, userId uint, session domain.Session) error
 		GetByRefreshToken(ctx context.Context, refreshToken string) (domain.User, error)
 	}
 
 	Admins interface {
 		GetById(ctx context.Context, userId uint) (domain.User, error)
-		GetByCredentials(ctx context.Context, input domain.UserSignInInput) (domain.User, error)
+		GetByCredentials(ctx context.Context, email, password string) (domain.User, error)
 		CreateSession(ctx context.Context, adminId uint, session domain.Session) error
 		GetByRefreshToken(ctx context.Context, refreshToken string) (domain.User, error)
 

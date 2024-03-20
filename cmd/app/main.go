@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"log/slog"
 
 	"github.com/dzhordano/go-posts/internal/common/config"
 	delivery "github.com/dzhordano/go-posts/internal/delivery/http"
@@ -10,6 +11,7 @@ import (
 	"github.com/dzhordano/go-posts/internal/service"
 	"github.com/dzhordano/go-posts/pkg/auth"
 	"github.com/dzhordano/go-posts/pkg/hasher"
+	"github.com/dzhordano/go-posts/pkg/logger"
 	"github.com/dzhordano/go-posts/pkg/postgres"
 	"github.com/dzhordano/go-posts/pkg/server"
 )
@@ -17,7 +19,25 @@ import (
 // configs dir path
 var cfgPath = "configs"
 
+// TODO: do more user tests. admin+posts+comments tests.
+
+//	@title			Go-Posts Api
+//	@version		1.0
+//	@description	...
+//	@host			localhost:8081
+//	@BasePath		/api/v1
+
+//	@securityDefinitions.apiKey	UserAuth
+//	@in							header
+//	@name						Authorization
+
+//	@securityDefinitions.apiKey	AdminAuth
+//	@in							header
+//	@name						Authorization
 func main() {
+	// TODO: user this logger
+	slog.SetDefault(logger.InitLogger())
+
 	// load cfg from env and yaml
 	cfg, err := config.MustLoad(cfgPath)
 	if err != nil {
@@ -65,7 +85,7 @@ func main() {
 	handlers := delivery.NewHandler(services, tokenManager)
 
 	// Init server
-	srv := server.NewServer(cfg, handlers.Init())
+	srv := server.NewServer(cfg, handlers.Init(cfg))
 
 	// Run server
 	if err := srv.Run(); err != nil {

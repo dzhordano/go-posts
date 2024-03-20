@@ -87,7 +87,7 @@ func (mr *MockUsersMockRecorder) RefreshTokens(ctx, refreshToken any) *gomock.Ca
 }
 
 // SignIN mocks base method.
-func (m *MockUsers) SignIN(ctx context.Context, input domain.UserSignInInput) (service.Tokens, error) {
+func (m *MockUsers) SignIN(ctx context.Context, input service.UserSignInInput) (service.Tokens, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SignIN", ctx, input)
 	ret0, _ := ret[0].(service.Tokens)
@@ -102,7 +102,7 @@ func (mr *MockUsersMockRecorder) SignIN(ctx, input any) *gomock.Call {
 }
 
 // SignUP mocks base method.
-func (m *MockUsers) SignUP(ctx context.Context, input domain.UserSignUpInput) error {
+func (m *MockUsers) SignUP(ctx context.Context, input service.UserSignUpInput) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SignUP", ctx, input)
 	ret0, _ := ret[0].(error)
@@ -196,7 +196,7 @@ func (mr *MockAdminsMockRecorder) RefreshTokens(ctx, refreshToken any) *gomock.C
 }
 
 // SignIN mocks base method.
-func (m *MockAdmins) SignIN(ctx context.Context, input domain.UserSignInInput) (service.Tokens, error) {
+func (m *MockAdmins) SignIN(ctx context.Context, input service.UserSignInInput) (service.Tokens, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SignIN", ctx, input)
 	ret0, _ := ret[0].(service.Tokens)

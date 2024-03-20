@@ -35,9 +35,9 @@ func (r *AdminsRepo) GetById(ctx context.Context, userId uint) (domain.User, err
 	return admin, nil
 }
 
-func (r *AdminsRepo) GetByCredentials(ctx context.Context, input domain.UserSignInInput) (domain.User, error) {
+func (r *AdminsRepo) GetByCredentials(ctx context.Context, email, password string) (domain.User, error) {
 	query := fmt.Sprintf("SELECT id, name, email, password, registered, lastonline FROM %s WHERE email = $1 AND password = $2", admins_table)
-	rows, err := r.db.Query(ctx, query, input.Email, input.Password)
+	rows, err := r.db.Query(ctx, query, email, password)
 	if err != nil {
 		return domain.User{}, err
 	}

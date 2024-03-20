@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/dzhordano/go-posts/internal/domain"
+	"github.com/dzhordano/go-posts/internal/service"
 	"github.com/gin-gonic/gin"
 )
 
@@ -92,14 +93,17 @@ func (h *Handler) adminGetUserComments(c *gin.Context) {
 }
 
 func (h *Handler) adminSignIn(c *gin.Context) {
-	var input domain.UserSignInInput
+	var input userSignInInput
 
 	if err := c.BindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, err)
 		return
 	}
 
-	id, err := h.services.Admins.SignIN(c.Request.Context(), input)
+	id, err := h.services.Admins.SignIN(c.Request.Context(), service.UserSignInInput{
+		Email:    input.Email,
+		Password: input.Password,
+	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
