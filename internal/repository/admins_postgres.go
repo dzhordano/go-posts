@@ -143,7 +143,7 @@ func (r *AdminsRepo) SuspendPost(ctx context.Context, postId uint) error {
 }
 
 func (r *AdminsRepo) CensorComment(ctx context.Context, commId uint) error {
-	query := fmt.Sprintf("UPDATE %s SET censored = TRUE WHERE post_id = $1 AND id = $2", comments_table)
+	query := fmt.Sprintf("UPDATE %s SET censored = TRUE WHERE id = $1", comments_table)
 
 	_, err := r.db.Exec(ctx, query, commId)
 
