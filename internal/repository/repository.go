@@ -24,6 +24,7 @@ type (
 		GetByCredentials(ctx context.Context, email, password string) (domain.User, error)
 		CreateSession(ctx context.Context, userId uint, session domain.Session) error
 		GetByRefreshToken(ctx context.Context, refreshToken string) (domain.User, error)
+		Verify(ctx context.Context, userId uint, codeHash string) error
 	}
 
 	Admins interface {

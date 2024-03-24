@@ -7,7 +7,9 @@ import (
 	"github.com/dzhordano/go-posts/internal/domain"
 	"github.com/dzhordano/go-posts/internal/repository"
 	"github.com/dzhordano/go-posts/pkg/auth"
+	"github.com/dzhordano/go-posts/pkg/email"
 	"github.com/dzhordano/go-posts/pkg/hasher"
+	"github.com/dzhordano/go-posts/pkg/otp"
 )
 
 //go:generate mockgen -source=service.go -destination=mocks/mock.go
@@ -17,6 +19,8 @@ type (
 		SignUP(ctx context.Context, input UserSignUpInput) error
 		SignIN(ctx context.Context, input UserSignInInput) (Tokens, error)
 		RefreshTokens(ctx context.Context, refreshToken string) (Tokens, error)
+		Verify(ctx context.Context, userId uint, codeHash string) error
+
 		GetAll(ctx context.Context) ([]domain.User, error)
 		GetById(ctx context.Context, userId uint) (domain.User, error)
 	}
@@ -69,6 +73,16 @@ type (
 		UpdateUser(ctx context.Context, input domain.UpdateCommentInput, commId, userId uint) error
 		DeleteUser(ctx context.Context, commId, userId uint) error
 	}
+
+	VerificationEmailInput struct {
+		Email            string
+		Name             string
+		VerificationCode string
+	}
+
+	Emails interface {
+		SendUserVerificationEmail(VerificationEmailInput) error
+	}
 )
 
 type Tokens struct {
@@ -81,6 +95,7 @@ type Services struct {
 	Admins   Admins
 	Posts    Posts
 	Comments Comments
+	Emails   Emails
 }
 
 // services dependencies
@@ -88,15 +103,19 @@ type Deps struct {
 	Repos        *repository.Repos
 	Hasher       hasher.PassworsHasher
 	TokenManager auth.TokenManager
+	EmailSender  email.Sender
+	OtpGenerator otp.Generator
 
-	AccessTokenTTL  time.Duration
-	RefreshTokenTTL time.Duration
+	AccessTokenTTL         time.Duration
+	RefreshTokenTTL        time.Duration
+	VerificationCodeLength int
 }
 
 func NewService(deps Deps) *Services {
+	emailsService := NewEmailsService(deps.EmailSender)
 	commentsService := NewCommentsService(deps.Repos.Comments)
 	postsService := NewPostsService(deps.Repos.Posts, commentsService)
-	usersService := NewUsersService(deps.Repos.Users, deps.Hasher, deps.TokenManager, postsService, commentsService, deps.AccessTokenTTL, deps.RefreshTokenTTL)
+	usersService := NewUsersService(deps.Repos.Users, deps.Hasher, deps.TokenManager, postsService, commentsService, emailsService, deps.OtpGenerator, deps.AccessTokenTTL, deps.RefreshTokenTTL, deps.VerificationCodeLength)
 	adminsService := NewAdminsService(deps.Repos.Admins, deps.Hasher, deps.TokenManager, postsService, usersService, deps.AccessTokenTTL, deps.RefreshTokenTTL)
 
 	return &Services{
@@ -104,5 +123,6 @@ func NewService(deps Deps) *Services {
 		Admins:   adminsService,
 		Posts:    postsService,
 		Comments: commentsService,
+		Emails:   emailsService,
 	}
 }

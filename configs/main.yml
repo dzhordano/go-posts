@@ -11,3 +11,9 @@ postgres:
 auth:
   accessTokenTTL: 12h
   refreshTokenTTL: 720h #30 days
+  verificationCodeLength: 10
+
+smtp:
+  port: 465
+  host: "smtp.mail.ru"
+  from: "dzhalal.2017@mail.ru"

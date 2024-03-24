@@ -19,6 +19,8 @@ func (h *Handler) initUsersRoutes(api *gin.RouterGroup) {
 
 		auth := users.Group("/", h.userIdentity)
 		{
+			auth.POST("/verify/:code", h.userVerify)
+
 			posts := auth.Group("/posts")
 			{
 				posts.GET("/", h.getUserPosts)
@@ -55,18 +57,53 @@ type userSignInInput struct {
 	Password string `json:"password" binding:"required,min=8,max=64"`
 }
 
-// @Summary		Sign Up
-// @Tags			users
-// @Description	registration endpoint for users
-// @ID				user-signup
-// @Accept			json
-// @Produce		json
-// @Param			input	body	userSignUpInput	true	"account info"
-// @Success		201
-// @Failure		400,404	{object}	response
-// @Failure		500		{object}	response
-// @Failure		default	{object}	response
-// @Router			/users/sign-up [post]
+//	@Summary		User Verify
+//	@Security		UserAuth
+//	@Tags			users
+//	@Description	verification endpoint for users
+//	@ID				user-verify
+//	@Accept			json
+//	@Produce		json
+//	@Param			code	path		string	true	"verification code"
+//	@Success		200		{object}	response
+//	@Failure		400,404	{object}	response
+//	@Failure		500		{object}	response
+//	@Failure		default	{object}	response
+//	@Router			/users/verify/{code} [post]
+func (h *Handler) userVerify(c *gin.Context) {
+	code := c.Param("code")
+	if code == "" {
+		newResponse(c, http.StatusBadRequest, "code is empty")
+		return
+	}
+
+	id, err := h.getUserId(c)
+	if err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if err := h.services.Users.Verify(c.Request.Context(), id, code); err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+
+		return
+	}
+
+	c.JSON(http.StatusOK, response{"success"})
+}
+
+//	@Summary		Sign Up
+//	@Tags			users
+//	@Description	registration endpoint for users
+//	@ID				user-signup
+//	@Accept			json
+//	@Produce		json
+//	@Param			input	body		userSignUpInput	true	"account info"
+//	@Success		200		{object}	response
+//	@Failure		400,404	{object}	response
+//	@Failure		500		{object}	response
+//	@Failure		default	{object}	response
+//	@Router			/users/sign-up [post]
 func (h *Handler) userSignUp(c *gin.Context) {
 	var input userSignUpInput
 
@@ -86,21 +123,23 @@ func (h *Handler) userSignUp(c *gin.Context) {
 		return
 	}
 
-	c.Status(http.StatusCreated)
+	c.JSON(http.StatusOK, response{
+		Message: "verification link sent",
+	})
 }
 
-// @Summary		Sign In
-// @Tags			users
-// @Description	login for users
-// @ID				user-signin
-// @Accept			json
-// @Produce		json
-// @Param			input	body		userSignInInput	true	"account credentials"
-// @Success		200		{object}	tokenResponse
-// @Failure		400,404	{object}	response
-// @Failure		500		{object}	response
-// @Failure		default	{object}	response
-// @Router			/users/sign-in [post]
+//	@Summary		Sign In
+//	@Tags			users
+//	@Description	login for users
+//	@ID				user-signin
+//	@Accept			json
+//	@Produce		json
+//	@Param			input	body		userSignInInput	true	"account credentials"
+//	@Success		200		{object}	tokenResponse
+//	@Failure		400,404	{object}	response
+//	@Failure		500		{object}	response
+//	@Failure		default	{object}	response
+//	@Router			/users/sign-in [post]
 func (h *Handler) userSignIn(c *gin.Context) {
 	var input userSignInInput
 
@@ -130,18 +169,18 @@ type refreshInput struct {
 	RToken string `json:"token" binding:"required"`
 }
 
-// @Summary		Refresh Tokens
-// @Tags			users
-// @Description	refresh user's tokens
-// @ID				user-refresh-tokens
-// @Accept			json
-// @Produce		json
-// @Param			input	body		refreshInput	true	"refresh token"
-// @Success		200		{object}	tokenResponse
-// @Failure		400,404	{object}	response
-// @Failure		500		{object}	response
-// @Failure		default	{object}	response
-// @Router			/users/auth/refresh [post]
+//	@Summary		Refresh Tokens
+//	@Tags			users
+//	@Description	refresh user's tokens
+//	@ID				user-refresh-tokens
+//	@Accept			json
+//	@Produce		json
+//	@Param			input	body		refreshInput	true	"refresh token"
+//	@Success		200		{object}	tokenResponse
+//	@Failure		400,404	{object}	response
+//	@Failure		500		{object}	response
+//	@Failure		default	{object}	response
+//	@Router			/users/auth/refresh [post]
 func (h *Handler) userRefresh(c *gin.Context) {
 	var inp refreshInput
 	if err := c.BindJSON(&inp); err != nil {
@@ -163,18 +202,18 @@ func (h *Handler) userRefresh(c *gin.Context) {
 	})
 }
 
-// @Summary		Get User Posts
-// @Security		UserAuth
-// @Tags			users
-// @Description	get all user's posts
-// @ID				user-get-posts
-// @Accept			json
-// @Produce		json
-// @Success		200		{object}	dataResponse
-// @Failure		404		{object}	response
-// @Failure		500		{object}	response
-// @Failure		default	{object}	response
-// @Router			/users/posts [get]
+//	@Summary		Get User Posts
+//	@Security		UserAuth
+//	@Tags			users
+//	@Description	get all user's posts
+//	@ID				user-get-posts
+//	@Accept			json
+//	@Produce		json
+//	@Success		200		{object}	dataResponse
+//	@Failure		404		{object}	response
+//	@Failure		500		{object}	response
+//	@Failure		default	{object}	response
+//	@Router			/users/posts [get]
 func (h *Handler) getUserPosts(c *gin.Context) {
 	userId, err := h.getUserId(c)
 	if err != nil {
@@ -200,19 +239,19 @@ type createUserPostInput struct {
 	Description string `json:"description" binding:"required,min=1"`
 }
 
-// @Summary		Create User Post
-// @Security		UserAuth
-// @Tags			users
-// @Description	create post by user
-// @ID				user-create-post
-// @Param			input	body	createUserPostInput	true	"create user"
-// @Accept			json
-// @Produce		json
-// @Success		200		{object}	response
-// @Failure		400,404	{object}	response
-// @Failure		500		{object}	response
-// @Failure		default	{object}	response
-// @Router			/users/posts/{id} [post]
+//	@Summary		Create User Post
+//	@Security		UserAuth
+//	@Tags			users
+//	@Description	create post by user
+//	@ID				user-create-post
+//	@Param			input	body	createUserPostInput	true	"create user"
+//	@Accept			json
+//	@Produce		json
+//	@Success		200		{object}	response
+//	@Failure		400,404	{object}	response
+//	@Failure		500		{object}	response
+//	@Failure		default	{object}	response
+//	@Router			/users/posts/{id} [post]
 func (h *Handler) createUserPost(c *gin.Context) {
 	var input createUserPostInput
 
@@ -259,20 +298,20 @@ type updatePostInput struct {
 	Description *string `json:"description"`
 }
 
-// @Summary		Update User Post
-// @Security		UserAuth
-// @Tags			users
-// @Description	update user post
-// @ID				user-update-post
-// @Accept			json
-// @Produce		json
-// @Param			id					path		string			true	"post id"
-// @Param			input				body		updatePostInput	true	"update user post"
-// @Success		200					{object}	response
-// @Failure		400,404				{object}	response
-// @Failure		500					{object}	response
-// @Failure		default				{object}	response
-// @Router			/users/posts/{id} 	[put]
+//	@Summary		Update User Post
+//	@Security		UserAuth
+//	@Tags			users
+//	@Description	update user post
+//	@ID				user-update-post
+//	@Accept			json
+//	@Produce		json
+//	@Param			id					path		string			true	"post id"
+//	@Param			input				body		updatePostInput	true	"update user post"
+//	@Success		200					{object}	response
+//	@Failure		400,404				{object}	response
+//	@Failure		500					{object}	response
+//	@Failure		default				{object}	response
+//	@Router			/users/posts/{id} 	[put]
 func (h *Handler) updateUserPost(c *gin.Context) {
 	var input updatePostInput
 	if err := c.BindJSON(&input); err != nil {
@@ -309,19 +348,19 @@ func (h *Handler) updateUserPost(c *gin.Context) {
 	})
 }
 
-// @Summary		Delete User Post
-// @Security		UserAuth
-// @Tags			users
-// @Description	delete user post
-// @ID				user-delete-post
-// @Param			id	path	string	true	"post id"
-// @Accept			json
-// @Produce		json
-// @Success		200					{object}	response
-// @Failure		400,404				{object}	response
-// @Failure		500					{object}	response
-// @Failure		default				{object}	response
-// @Router			/users/posts/{id} 	[delete]
+//	@Summary		Delete User Post
+//	@Security		UserAuth
+//	@Tags			users
+//	@Description	delete user post
+//	@ID				user-delete-post
+//	@Param			id	path	string	true	"post id"
+//	@Accept			json
+//	@Produce		json
+//	@Success		200					{object}	response
+//	@Failure		400,404				{object}	response
+//	@Failure		500					{object}	response
+//	@Failure		default				{object}	response
+//	@Router			/users/posts/{id} 	[delete]
 func (h *Handler) deleteUserPost(c *gin.Context) {
 	postId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -352,20 +391,20 @@ type createPostCommentInput struct {
 	Data string `json:"data" binding:"required,min=1"`
 }
 
-// @Summary		Create Post Comment
-// @Security		UserAuth
-// @Tags			users
-// @Description	create post comment
-// @ID				user-post-comment
-// @Accept			json
-// @Produce		json
-// @Param			id							path		string					true	"post id"
-// @Param			input						body		createPostCommentInput	true	"create post comment"
-// @Success		200							{object}	response
-// @Failure		400,404						{object}	response
-// @Failure		500							{object}	response
-// @Failure		default						{object}	response
-// @Router			/users/posts/{id}/comment 	[post]
+//	@Summary		Create Post Comment
+//	@Security		UserAuth
+//	@Tags			users
+//	@Description	create post comment
+//	@ID				user-post-comment
+//	@Accept			json
+//	@Produce		json
+//	@Param			id							path		string					true	"post id"
+//	@Param			input						body		createPostCommentInput	true	"create post comment"
+//	@Success		200							{object}	response
+//	@Failure		400,404						{object}	response
+//	@Failure		500							{object}	response
+//	@Failure		default						{object}	response
+//	@Router			/users/posts/{id}/comment 	[post]
 func (h *Handler) createPostComment(c *gin.Context) {
 	var input createPostCommentInput
 	if err := c.BindJSON(&input); err != nil {
@@ -405,20 +444,20 @@ func (h *Handler) createPostComment(c *gin.Context) {
 	})
 }
 
-// @Summary		Get User's Post Comments
-// @Security		UserAuth
-// @Tags			users
-// @Description	get all user's post comments
-// @ID				user-get-post-comments
-// @Accept			json
-// @Produce		json
-// @Param			id							path		string					true	"post id"
-// @Param			input						body		createPostCommentInput	true	"create post comment"
-// @Success		200							{object}	dataResponse
-// @Failure		400,404						{object}	response
-// @Failure		500							{object}	response
-// @Failure		default						{object}	response
-// @Router			/users/posts/{id}/comments 	[get]
+//	@Summary		Get User's Post Comments
+//	@Security		UserAuth
+//	@Tags			users
+//	@Description	get all user's post comments
+//	@ID				user-get-post-comments
+//	@Accept			json
+//	@Produce		json
+//	@Param			id							path		string					true	"post id"
+//	@Param			input						body		createPostCommentInput	true	"create post comment"
+//	@Success		200							{object}	dataResponse
+//	@Failure		400,404						{object}	response
+//	@Failure		500							{object}	response
+//	@Failure		default						{object}	response
+//	@Router			/users/posts/{id}/comments 	[get]
 func (h *Handler) getUserPostComments(c *gin.Context) {
 	userId, err := h.getUserId(c)
 	if err != nil {
@@ -446,18 +485,18 @@ func (h *Handler) getUserPostComments(c *gin.Context) {
 	})
 }
 
-// @Summary		Get All User Comments
-// @Security		UserAuth
-// @Tags			users
-// @Description	get all user comments
-// @ID				user-get-all-comments
-// @Accept			json
-// @Produce		json
-// @Success		200					{object}	dataResponse
-// @Failure		404					{object}	response
-// @Failure		500					{object}	response
-// @Failure		default				{object}	response
-// @Router			/users/comments/ 	[get]
+//	@Summary		Get All User Comments
+//	@Security		UserAuth
+//	@Tags			users
+//	@Description	get all user comments
+//	@ID				user-get-all-comments
+//	@Accept			json
+//	@Produce		json
+//	@Success		200					{object}	dataResponse
+//	@Failure		404					{object}	response
+//	@Failure		500					{object}	response
+//	@Failure		default				{object}	response
+//	@Router			/users/comments/ 	[get]
 func (h *Handler) getUserComments(c *gin.Context) {
 	userId, err := h.getUserId(c)
 	if err != nil {
@@ -478,19 +517,19 @@ func (h *Handler) getUserComments(c *gin.Context) {
 	})
 }
 
-// @Summary		Update User Comment
-// @Security		UserAuth
-// @Tags			users
-// @Description	update user comment
-// @ID				update-user-comment
-// @Accept			json
-// @Produce		json
-// @Param			id						path		string	true	"comment id"
-// @Success		200						{object}	response
-// @Failure		400,404					{object}	response
-// @Failure		500						{object}	response
-// @Failure		default					{object}	response
-// @Router			/users/comments/{id} 	[put]
+//	@Summary		Update User Comment
+//	@Security		UserAuth
+//	@Tags			users
+//	@Description	update user comment
+//	@ID				update-user-comment
+//	@Accept			json
+//	@Produce		json
+//	@Param			id						path		string	true	"comment id"
+//	@Success		200						{object}	response
+//	@Failure		400,404					{object}	response
+//	@Failure		500						{object}	response
+//	@Failure		default					{object}	response
+//	@Router			/users/comments/{id} 	[put]
 func (h *Handler) updateUserComment(c *gin.Context) {
 	var input domain.UpdateCommentInput
 	if err := c.BindJSON(&input); err != nil {
@@ -524,19 +563,19 @@ func (h *Handler) updateUserComment(c *gin.Context) {
 	})
 }
 
-// @Summary		Delete User Comment
-// @Security		UserAuth
-// @Tags			users
-// @Description	delete user comment
-// @ID				delete-user-comment
-// @Accept			json
-// @Produce		json
-// @Param			id						path		string	true	"comment id"
-// @Success		200						{object}	response
-// @Failure		400,404					{object}	response
-// @Failure		500						{object}	response
-// @Failure		default					{object}	response
-// @Router			/users/comments/{id} 	[delete]
+//	@Summary		Delete User Comment
+//	@Security		UserAuth
+//	@Tags			users
+//	@Description	delete user comment
+//	@ID				delete-user-comment
+//	@Accept			json
+//	@Produce		json
+//	@Param			id						path		string	true	"comment id"
+//	@Success		200						{object}	response
+//	@Failure		400,404					{object}	response
+//	@Failure		500						{object}	response
+//	@Failure		default					{object}	response
+//	@Router			/users/comments/{id} 	[delete]
 func (h *Handler) deleteUserComment(c *gin.Context) {
 	commentId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -563,19 +602,19 @@ func (h *Handler) deleteUserComment(c *gin.Context) {
 	})
 }
 
-// @Summary		User Like Post
-// @Security		UserAuth
-// @Tags			users
-// @Description	user like post
-// @ID				user-like-post
-// @Accept			json
-// @Produce		json
-// @Param			id						path		string	true	"post id"
-// @Success		200						{object}	response
-// @Failure		400,404					{object}	response
-// @Failure		500						{object}	response
-// @Failure		default					{object}	response
-// @Router			/users/posts/{id}/like 	[post]
+//	@Summary		User Like Post
+//	@Security		UserAuth
+//	@Tags			users
+//	@Description	user like post
+//	@ID				user-like-post
+//	@Accept			json
+//	@Produce		json
+//	@Param			id						path		string	true	"post id"
+//	@Success		200						{object}	response
+//	@Failure		400,404					{object}	response
+//	@Failure		500						{object}	response
+//	@Failure		default					{object}	response
+//	@Router			/users/posts/{id}/like 	[post]
 func (h *Handler) userLikePost(c *gin.Context) {
 	postId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -595,19 +634,19 @@ func (h *Handler) userLikePost(c *gin.Context) {
 	})
 }
 
-// @Summary		User Unlike Post
-// @Security		UserAuth
-// @Tags			users
-// @Description	user unlike post
-// @ID				user-unlike-post
-// @Accept			json
-// @Produce		json
-// @Param			id							path		string	true	"post id"
-// @Success		200							{object}	response
-// @Failure		400,404						{object}	response
-// @Failure		500							{object}	response
-// @Failure		default						{object}	response
-// @Router			/users/posts/{id}/unlike 	[post]
+//	@Summary		User Unlike Post
+//	@Security		UserAuth
+//	@Tags			users
+//	@Description	user unlike post
+//	@ID				user-unlike-post
+//	@Accept			json
+//	@Produce		json
+//	@Param			id							path		string	true	"post id"
+//	@Success		200							{object}	response
+//	@Failure		400,404						{object}	response
+//	@Failure		500							{object}	response
+//	@Failure		default						{object}	response
+//	@Router			/users/posts/{id}/unlike 	[post]
 func (h *Handler) userRemoveLike(c *gin.Context) {
 	postId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

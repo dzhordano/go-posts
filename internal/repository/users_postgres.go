@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -96,4 +97,21 @@ func (r *UsersRepo) GetById(ctx context.Context, userId uint) (domain.User, erro
 	}
 
 	return user, nil
+}
+
+func (r *UsersRepo) Verify(ctx context.Context, userId uint, codeHash string) error {
+	query := fmt.Sprintf("UPDATE %s SET verification.code = '', verification.verified = true WHERE id = $1 AND (verification).code = $2",
+		users_table)
+
+	res, err := r.db.Exec(ctx, query, userId, codeHash)
+	if err != nil {
+		return err
+	}
+
+	n := res.RowsAffected()
+	if n == 0 {
+		return errors.New("verification code invalid")
+	}
+
+	return nil
 }

@@ -52,18 +52,18 @@ func (h *Handler) initAdminsRoutes(api *gin.RouterGroup) {
 	}
 }
 
-// @Summary		Sign In
-// @Tags			admins
-// @Description	login for admin
-// @ID				admin-signup
-// @Accept			json
-// @Produce		json
-// @Param			input	body		userSignInInput	true	"account info"
-// @Success		200		{object}	tokenResponse
-// @Failure		400,404	{object}	response
-// @Failure		500		{object}	response
-// @Failure		default	{object}	response
-// @Router			/admins/sign-in [post]
+//	@Summary		Sign In
+//	@Tags			admins
+//	@Description	login for admin
+//	@ID				admin-signup
+//	@Accept			json
+//	@Produce		json
+//	@Param			input	body		userSignInInput	true	"account info"
+//	@Success		200		{object}	tokenResponse
+//	@Failure		400,404	{object}	response
+//	@Failure		500		{object}	response
+//	@Failure		default	{object}	response
+//	@Router			/admins/sign-in [post]
 func (h *Handler) adminSignIn(c *gin.Context) {
 	var input userSignInInput
 
@@ -87,18 +87,18 @@ func (h *Handler) adminSignIn(c *gin.Context) {
 	})
 }
 
-// @Summary		Refresh Tokens
-// @Tags			admins
-// @Description	refresh admin's tokens
-// @ID				admin-refresh-tokens
-// @Accept			json
-// @Produce		json
-// @Param			input	body		refreshInput	true	"refresh token"
-// @Success		200		{object}	tokenResponse
-// @Failure		400,404	{object}	response
-// @Failure		500		{object}	response
-// @Failure		default	{object}	response
-// @Router			/admin/auth/refresh [post]
+//	@Summary		Refresh Tokens
+//	@Tags			admins
+//	@Description	refresh admin's tokens
+//	@ID				admin-refresh-tokens
+//	@Accept			json
+//	@Produce		json
+//	@Param			input	body		refreshInput	true	"refresh token"
+//	@Success		200		{object}	tokenResponse
+//	@Failure		400,404	{object}	response
+//	@Failure		500		{object}	response
+//	@Failure		default	{object}	response
+//	@Router			/admin/auth/refresh [post]
 func (h *Handler) adminRefresh(c *gin.Context) {
 	var inp refreshInput
 	if err := c.BindJSON(&inp); err != nil {
@@ -120,18 +120,18 @@ func (h *Handler) adminRefresh(c *gin.Context) {
 	})
 }
 
-// @Summary		Get Users
-// @Security		AdminAuth
-// @Tags			admins
-// @Description	get all users
-// @ID				admin-get-users
-// @Accept			json
-// @Produce		json
-// @Success		200		{object}	dataResponse
-// @Failure		404		{object}	response
-// @Failure		500		{object}	response
-// @Failure		default	{object}	response
-// @Router			/admins/users [get]
+//	@Summary		Get Users
+//	@Security		AdminAuth
+//	@Tags			admins
+//	@Description	get all users
+//	@ID				admin-get-users
+//	@Accept			json
+//	@Produce		json
+//	@Success		200		{object}	dataResponse
+//	@Failure		404		{object}	response
+//	@Failure		500		{object}	response
+//	@Failure		default	{object}	response
+//	@Router			/admins/users [get]
 func (h *Handler) adminGetUsers(c *gin.Context) {
 	users, err := h.services.Users.GetAll(c.Request.Context())
 	if err != nil {
@@ -145,19 +145,19 @@ func (h *Handler) adminGetUsers(c *gin.Context) {
 	})
 }
 
-// @Summary		Get User By Id
-// @Security		AdminAuth
-// @Tags			admins
-// @Description	get user by id
-// @ID				admin-get-user-by-id
-// @Accept			json
-// @Produce		json
-// @Param			id		path		string	true	"user id"
-// @Success		200		{object}	dataResponse
-// @Failure		400,404	{object}	response
-// @Failure		500		{object}	response
-// @Failure		default	{object}	response
-// @Router			/admins/users/{id} [get]
+//	@Summary		Get User By Id
+//	@Security		AdminAuth
+//	@Tags			admins
+//	@Description	get user by id
+//	@ID				admin-get-user-by-id
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		string	true	"user id"
+//	@Success		200		{object}	dataResponse
+//	@Failure		400,404	{object}	response
+//	@Failure		500		{object}	response
+//	@Failure		default	{object}	response
+//	@Router			/admins/users/{id} [get]
 func (h *Handler) adminGetUserById(c *gin.Context) {
 	userId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -178,20 +178,20 @@ func (h *Handler) adminGetUserById(c *gin.Context) {
 	})
 }
 
-// @Summary		Alter User
-// @Security		AdminAuth
-// @Tags			admins
-// @Description	alter user
-// @ID				admin-alter-user
-// @Accept			json
-// @Produce		json
-// @Param			id		path		string					true	"user id"
-// @Param			input	body		domain.UpdateUserInput	true	"update info"
-// @Success		200		{object}	response
-// @Failure		400,404	{object}	response
-// @Failure		500		{object}	response
-// @Failure		default	{object}	response
-// @Router			/admins/users/{id} [put]
+//	@Summary		Alter User
+//	@Security		AdminAuth
+//	@Tags			admins
+//	@Description	alter user
+//	@ID				admin-alter-user
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		string					true	"user id"
+//	@Param			input	body		domain.UpdateUserInput	true	"update info"
+//	@Success		200		{object}	response
+//	@Failure		400,404	{object}	response
+//	@Failure		500		{object}	response
+//	@Failure		default	{object}	response
+//	@Router			/admins/users/{id} [put]
 func (h *Handler) adminAlterUser(c *gin.Context) {
 	var input domain.UpdateUserInput
 	if err := c.BindJSON(&input); err != nil {
@@ -218,19 +218,19 @@ func (h *Handler) adminAlterUser(c *gin.Context) {
 	})
 }
 
-// @Summary		Delete User
-// @Security		AdminAuth
-// @Tags			admins
-// @Description	delete user
-// @ID				admin-delete-user
-// @Accept			json
-// @Produce		json
-// @Param			id		path		string	true	"user id"
-// @Success		200		{object}	response
-// @Failure		400,404	{object}	response
-// @Failure		500		{object}	response
-// @Failure		default	{object}	response
-// @Router			/admins/users/{id} [delete]
+//	@Summary		Delete User
+//	@Security		AdminAuth
+//	@Tags			admins
+//	@Description	delete user
+//	@ID				admin-delete-user
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		string	true	"user id"
+//	@Success		200		{object}	response
+//	@Failure		400,404	{object}	response
+//	@Failure		500		{object}	response
+//	@Failure		default	{object}	response
+//	@Router			/admins/users/{id} [delete]
 func (h *Handler) adminDeleteUser(c *gin.Context) {
 	userId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -250,19 +250,19 @@ func (h *Handler) adminDeleteUser(c *gin.Context) {
 	})
 }
 
-// @Summary		Suspend User
-// @Security		AdminAuth
-// @Tags			admins
-// @Description	suspend user
-// @ID				admin-suspend-user
-// @Accept			json
-// @Produce		json
-// @Param			id		path		string	true	"user id"
-// @Success		200		{object}	response
-// @Failure		400,404	{object}	response
-// @Failure		500		{object}	response
-// @Failure		default	{object}	response
-// @Router			/admins/users/{id}/suspend [post]
+//	@Summary		Suspend User
+//	@Security		AdminAuth
+//	@Tags			admins
+//	@Description	suspend user
+//	@ID				admin-suspend-user
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		string	true	"user id"
+//	@Success		200		{object}	response
+//	@Failure		400,404	{object}	response
+//	@Failure		500		{object}	response
+//	@Failure		default	{object}	response
+//	@Router			/admins/users/{id}/suspend [post]
 func (h *Handler) adminSuspendUser(c *gin.Context) {
 	userId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -282,20 +282,20 @@ func (h *Handler) adminSuspendUser(c *gin.Context) {
 	})
 }
 
-// @Summary		Alter Post
-// @Security		AdminAuth
-// @Tags			admins
-// @Description	alter post
-// @ID				admin-alter-post
-// @Accept			json
-// @Produce		json
-// @Param			id		path		string			true	"post id"
-// @Param			input	body		updatePostInput	true	"update info"
-// @Success		200		{object}	response
-// @Failure		400,404	{object}	response
-// @Failure		500		{object}	response
-// @Failure		default	{object}	response
-// @Router			/admins/posts/{id} [put]
+//	@Summary		Alter Post
+//	@Security		AdminAuth
+//	@Tags			admins
+//	@Description	alter post
+//	@ID				admin-alter-post
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		string			true	"post id"
+//	@Param			input	body		updatePostInput	true	"update info"
+//	@Success		200		{object}	response
+//	@Failure		400,404	{object}	response
+//	@Failure		500		{object}	response
+//	@Failure		default	{object}	response
+//	@Router			/admins/posts/{id} [put]
 func (h *Handler) adminAlterPost(c *gin.Context) {
 	var input updatePostInput
 	if err := c.BindJSON(&input); err != nil {
@@ -325,19 +325,19 @@ func (h *Handler) adminAlterPost(c *gin.Context) {
 	})
 }
 
-// @Summary		Delete Post
-// @Security		AdminAuth
-// @Tags			admins
-// @Description	delete post
-// @ID				admin-delete-post
-// @Accept			json
-// @Produce		json
-// @Param			id		path		string	true	"post id"
-// @Success		200		{object}	response
-// @Failure		400,404	{object}	response
-// @Failure		500		{object}	response
-// @Failure		default	{object}	response
-// @Router			/admins/posts/{id} [delete]
+//	@Summary		Delete Post
+//	@Security		AdminAuth
+//	@Tags			admins
+//	@Description	delete post
+//	@ID				admin-delete-post
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		string	true	"post id"
+//	@Success		200		{object}	response
+//	@Failure		400,404	{object}	response
+//	@Failure		500		{object}	response
+//	@Failure		default	{object}	response
+//	@Router			/admins/posts/{id} [delete]
 func (h *Handler) adminDeletePost(c *gin.Context) {
 	postId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -355,19 +355,19 @@ func (h *Handler) adminDeletePost(c *gin.Context) {
 	})
 }
 
-// @Summary		Suspend Post
-// @Security		AdminAuth
-// @Tags			admins
-// @Description	suspend post
-// @ID				admin-suspend-post
-// @Accept			json
-// @Produce		json
-// @Param			id		path		string	true	"post id"
-// @Success		200		{object}	response
-// @Failure		400,404	{object}	response
-// @Failure		500		{object}	response
-// @Failure		default	{object}	response
-// @Router			/admins/posts/{id}/suspend [post]
+//	@Summary		Suspend Post
+//	@Security		AdminAuth
+//	@Tags			admins
+//	@Description	suspend post
+//	@ID				admin-suspend-post
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		string	true	"post id"
+//	@Success		200		{object}	response
+//	@Failure		400,404	{object}	response
+//	@Failure		500		{object}	response
+//	@Failure		default	{object}	response
+//	@Router			/admins/posts/{id}/suspend [post]
 func (h *Handler) adminSuspendPost(c *gin.Context) {
 	postId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -385,19 +385,19 @@ func (h *Handler) adminSuspendPost(c *gin.Context) {
 	})
 }
 
-// @Summary		Censor Comment
-// @Security		AdminAuth
-// @Tags			admins
-// @Description	censor comment
-// @ID				admin-censor-comment
-// @Accept			json
-// @Produce		json
-// @Param			id		path		string	true	"comment id"
-// @Success		200		{object}	response
-// @Failure		400,404	{object}	response
-// @Failure		500		{object}	response
-// @Failure		default	{object}	response
-// @Router			/admins/comments/{id}/censor [post]
+//	@Summary		Censor Comment
+//	@Security		AdminAuth
+//	@Tags			admins
+//	@Description	censor comment
+//	@ID				admin-censor-comment
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		string	true	"comment id"
+//	@Success		200		{object}	response
+//	@Failure		400,404	{object}	response
+//	@Failure		500		{object}	response
+//	@Failure		default	{object}	response
+//	@Router			/admins/comments/{id}/censor [post]
 func (h *Handler) adminCensorComment(c *gin.Context) {
 	commId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -417,19 +417,19 @@ func (h *Handler) adminCensorComment(c *gin.Context) {
 	})
 }
 
-// @Summary		Delete Comment
-// @Security		AdminAuth
-// @Tags			admins
-// @Description	delete comment
-// @ID				admin-delete-comment
-// @Accept			json
-// @Produce		json
-// @Param			id		path		string	true	"comment id"
-// @Success		200		{object}	response
-// @Failure		400,404	{object}	response
-// @Failure		500		{object}	response
-// @Failure		default	{object}	response
-// @Router			/admins/comments/{id} [delete]
+//	@Summary		Delete Comment
+//	@Security		AdminAuth
+//	@Tags			admins
+//	@Description	delete comment
+//	@ID				admin-delete-comment
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		string	true	"comment id"
+//	@Success		200		{object}	response
+//	@Failure		400,404	{object}	response
+//	@Failure		500		{object}	response
+//	@Failure		default	{object}	response
+//	@Router			/admins/comments/{id} [delete]
 func (h *Handler) adminDeleteComment(c *gin.Context) {
 	commId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -449,19 +449,19 @@ func (h *Handler) adminDeleteComment(c *gin.Context) {
 	})
 }
 
-// @Summary		Get User Posts
-// @Security		AdminAuth
-// @Tags			admins
-// @Description	get all user's posts
-// @ID				admin-get-user-posts
-// @Accept			json
-// @Produce		json
-// @Param			id		path		string	true	"user id"
-// @Success		200		{object}	dataResponse
-// @Failure		400,404	{object}	response
-// @Failure		500		{object}	response
-// @Failure		default	{object}	response
-// @Router			/admins/users/{id}/posts [get]
+//	@Summary		Get User Posts
+//	@Security		AdminAuth
+//	@Tags			admins
+//	@Description	get all user's posts
+//	@ID				admin-get-user-posts
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		string	true	"user id"
+//	@Success		200		{object}	dataResponse
+//	@Failure		400,404	{object}	response
+//	@Failure		500		{object}	response
+//	@Failure		default	{object}	response
+//	@Router			/admins/users/{id}/posts [get]
 func (h *Handler) adminGetUserPosts(c *gin.Context) {
 	userId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -482,19 +482,19 @@ func (h *Handler) adminGetUserPosts(c *gin.Context) {
 	})
 }
 
-// @Summary		Get User Comments
-// @Security		AdminAuth
-// @Tags			admins
-// @Description	get all user's comments
-// @ID				admin-get-user-comments
-// @Accept			json
-// @Produce		json
-// @Param			id		path		string	true	"user id"
-// @Success		200		{object}	dataResponse
-// @Failure		400,404	{object}	response
-// @Failure		500		{object}	response
-// @Failure		default	{object}	response
-// @Router			/admins/users/{id}/comments [get]
+//	@Summary		Get User Comments
+//	@Security		AdminAuth
+//	@Tags			admins
+//	@Description	get all user's comments
+//	@ID				admin-get-user-comments
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		string	true	"user id"
+//	@Success		200		{object}	dataResponse
+//	@Failure		400,404	{object}	response
+//	@Failure		500		{object}	response
+//	@Failure		default	{object}	response
+//	@Router			/admins/users/{id}/comments [get]
 func (h *Handler) adminGetUserComments(c *gin.Context) {
 	userId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

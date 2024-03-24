@@ -20,11 +20,13 @@ type (
 		AUTH AUTHConfig
 		HTTP HTTPConfig
 		PG   PGConfig
+		SMTP SMTPConfig
 	}
 
 	AUTHConfig struct {
-		JWT          JWTConfig
-		PasswordSalt string
+		JWT                    JWTConfig
+		PasswordSalt           string
+		VerificationCodeLength int `mapstructure:"verificationCodeLength"`
 	}
 
 	JWTConfig struct {
@@ -46,6 +48,13 @@ type (
 		Username string
 		Password string
 		SSLMode  string
+	}
+
+	SMTPConfig struct {
+		Port int    `mapstructure:"port"`
+		Host string `mapstructure:"host"`
+		From string `mapstructure:"from"`
+		Pass string
 	}
 )
 
@@ -85,6 +94,14 @@ func unmarshalVals(cfg *Config) error {
 		return err
 	}
 
+	if err := viper.UnmarshalKey("auth", &cfg.AUTH); err != nil {
+		return err
+	}
+
+	if err := viper.UnmarshalKey("smtp", &cfg.SMTP); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -98,4 +115,6 @@ func setFromEnv(cfg *Config) {
 	cfg.PG.Port = os.Getenv("PG_PORT")
 	cfg.PG.Username = os.Getenv("PG_USERNAME")
 	cfg.PG.Password = os.Getenv("PG_PASSWORD")
+
+	cfg.SMTP.Pass = os.Getenv("SMTP_PASSWORD")
 }

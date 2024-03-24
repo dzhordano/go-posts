@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"log/slog"
 
@@ -10,8 +11,10 @@ import (
 	"github.com/dzhordano/go-posts/internal/repository"
 	"github.com/dzhordano/go-posts/internal/service"
 	"github.com/dzhordano/go-posts/pkg/auth"
+	"github.com/dzhordano/go-posts/pkg/email/smtp"
 	"github.com/dzhordano/go-posts/pkg/hasher"
 	"github.com/dzhordano/go-posts/pkg/logger"
+	"github.com/dzhordano/go-posts/pkg/otp"
 	"github.com/dzhordano/go-posts/pkg/postgres"
 	"github.com/dzhordano/go-posts/pkg/server"
 )
@@ -31,9 +34,9 @@ var cfgPath = "configs"
 //	@in							header
 //	@name						Authorization
 
-//	@securityDefinitions.apiKey	AdminAuth
-//	@in							header
-//	@name						Authorization
+// @securityDefinitions.apiKey	AdminAuth
+// @in							header
+// @name						Authorization
 func main() {
 	// TODO: user this logger
 	slog.SetDefault(logger.InitLogger())
@@ -43,6 +46,9 @@ func main() {
 	if err != nil {
 		log.Fatal("error initializing config")
 	}
+
+	// one time password* generator init
+	otpGenerator := otp.NewGOTPGenerator()
 
 	// init token manager (jwt tokens manager)
 	tokenManager, err := auth.NewManager(cfg.AUTH.JWT.SigningKey)
@@ -68,6 +74,13 @@ func main() {
 	}
 	defer pgclient.Close()
 
+	fmt.Println(cfg.AUTH.VerificationCodeLength)
+	// Init email sender
+	emailSender, err := smtp.NewSMTPSender(cfg.SMTP.From, cfg.SMTP.Pass, cfg.SMTP.Host, cfg.SMTP.Port)
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+
 	// Init repositories
 	repos := repository.NewRepos(pgclient)
 
@@ -76,9 +89,12 @@ func main() {
 		Repos:        repos,
 		Hasher:       hasher,
 		TokenManager: tokenManager,
+		EmailSender:  emailSender,
+		OtpGenerator: otpGenerator,
 
-		AccessTokenTTL:  cfg.AUTH.JWT.AccessTokenTTL,
-		RefreshTokenTTL: cfg.AUTH.JWT.RefreshTokenTTL,
+		AccessTokenTTL:         cfg.AUTH.JWT.AccessTokenTTL,
+		RefreshTokenTTL:        cfg.AUTH.JWT.RefreshTokenTTL,
+		VerificationCodeLength: cfg.AUTH.VerificationCodeLength,
 	})
 
 	// Init handlers
