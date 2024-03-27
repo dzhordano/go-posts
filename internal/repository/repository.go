@@ -12,6 +12,7 @@ const (
 	admins_table   = "admins"
 	posts_table    = "posts"
 	comments_table = "comments"
+	reports_table  = "reports"
 
 	users_posts = "users_posts"
 )
@@ -39,6 +40,7 @@ type (
 		SuspendPost(ctx context.Context, postId uint) error
 		CensorComment(ctx context.Context, commId uint) error
 		DeleteComment(ctx context.Context, commId uint) error
+		DealReport(ctx context.Context, reportId uint) error
 	}
 
 	Posts interface {
@@ -53,6 +55,8 @@ type (
 		DeleteUser(ctx context.Context, postId, userId uint) error
 		Like(ctx context.Context, postId uint) error
 		RemoveLike(ctx context.Context, postId uint) error
+		Report(ctx context.Context, postId, userId uint) error
+		GetAllReports(ctx context.Context) ([]domain.Report, error)
 	}
 
 	Comments interface {

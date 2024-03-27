@@ -166,6 +166,20 @@ func (mr *MockAdminsMockRecorder) CensorComment(ctx, commId any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CensorComment", reflect.TypeOf((*MockAdmins)(nil).CensorComment), ctx, commId)
 }
 
+// DealReport mocks base method.
+func (m *MockAdmins) DealReport(ctx context.Context, reportId uint) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DealReport", ctx, reportId)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DealReport indicates an expected call of DealReport.
+func (mr *MockAdminsMockRecorder) DealReport(ctx, reportId any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DealReport", reflect.TypeOf((*MockAdmins)(nil).DealReport), ctx, reportId)
+}
+
 // DeleteComment mocks base method.
 func (m *MockAdmins) DeleteComment(ctx context.Context, commId uint) error {
 	m.ctrl.T.Helper()
@@ -346,6 +360,21 @@ func (mr *MockPostsMockRecorder) GetAll(ctx any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAll", reflect.TypeOf((*MockPosts)(nil).GetAll), ctx)
 }
 
+// GetAllReports mocks base method.
+func (m *MockPosts) GetAllReports(ctx context.Context) ([]domain.Report, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAllReports", ctx)
+	ret0, _ := ret[0].([]domain.Report)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAllReports indicates an expected call of GetAllReports.
+func (mr *MockPostsMockRecorder) GetAllReports(ctx any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllReports", reflect.TypeOf((*MockPosts)(nil).GetAllReports), ctx)
+}
+
 // GetAllUser mocks base method.
 func (m *MockPosts) GetAllUser(ctx context.Context, userId uint) ([]domain.Post, error) {
 	m.ctrl.T.Helper()
@@ -402,6 +431,20 @@ func (m *MockPosts) RemoveLike(ctx context.Context, postId uint) error {
 func (mr *MockPostsMockRecorder) RemoveLike(ctx, postId any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveLike", reflect.TypeOf((*MockPosts)(nil).RemoveLike), ctx, postId)
+}
+
+// Report mocks base method.
+func (m *MockPosts) Report(ctx context.Context, postId, userId uint) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Report", ctx, postId, userId)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Report indicates an expected call of Report.
+func (mr *MockPostsMockRecorder) Report(ctx, postId, userId any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Report", reflect.TypeOf((*MockPosts)(nil).Report), ctx, postId, userId)
 }
 
 // Update mocks base method.

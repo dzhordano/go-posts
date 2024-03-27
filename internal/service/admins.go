@@ -108,3 +108,7 @@ func (s *AdminsService) CensorComment(ctx context.Context, commId uint) error {
 func (s *AdminsService) DeleteComment(ctx context.Context, commId uint) error {
 	return s.repo.DeleteComment(ctx, commId)
 }
+
+func (s *AdminsService) DealReport(ctx context.Context, reportId uint) error {
+	return s.repo.DealReport(ctx, reportId)
+}

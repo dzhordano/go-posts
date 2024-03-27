@@ -36,7 +36,6 @@ func (r *UsersRepo) GetByCredentials(ctx context.Context, email, password string
 
 	var user domain.User
 
-	// TODO: do i need to set session values?
 	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Password, &user.Verification.Code, &user.Verification.Verified, &user.Suspended, &user.RegisteredAt, &user.LastOnline)
 	if err != nil {
 		return domain.User{}, err

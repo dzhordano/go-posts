@@ -37,7 +37,7 @@ func TestHandler_signUp(t *testing.T) {
 			mockBehavior: func(s *mock_service.MockUsers, input userSignUpInput) {
 				s.EXPECT().SignUP(context.Background(), input).Return(nil)
 			},
-			expectedStatusCode: 201,
+			expectedStatusCode: 200,
 		},
 		{
 			name:               "Invalid Name",

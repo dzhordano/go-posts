@@ -17,17 +17,17 @@ func (h *Handler) initPostsRoutes(api *gin.RouterGroup) {
 	}
 }
 
-// @Summary		Get All Posts
-// @Tags			posts
-// @Description	get all  posts
-// @ID				get-all-posts
-// @Accept			json
-// @Produce		json
-// @Success		200		{object}	dataResponse
-// @Failure		404		{object}	response
-// @Failure		500		{object}	response
-// @Failure		default	{object}	response
-// @Router			/posts [get]
+//	@Summary		Get All Posts
+//	@Tags			posts
+//	@Description	get all  posts
+//	@ID				get-all-posts
+//	@Accept			json
+//	@Produce		json
+//	@Success		200		{object}	dataResponse
+//	@Failure		404		{object}	response
+//	@Failure		500		{object}	response
+//	@Failure		default	{object}	response
+//	@Router			/posts [get]
 func (h *Handler) getAllPosts(c *gin.Context) {
 	// TODO: think of retrieving random posts instead, so request is not long and make retrieval random
 	posts, err := h.services.Posts.GetAll(c.Request.Context())
@@ -41,18 +41,18 @@ func (h *Handler) getAllPosts(c *gin.Context) {
 	})
 }
 
-// @Summary		Get Post By Id
-// @Tags			posts
-// @Description	get post by id
-// @ID				get-post-by-id
-// @Accept			json
-// @Produce		json
-// @Param			id		path		string	true	"post id"
-// @Success		200		{object}	dataResponse
-// @Failure		400,404	{object}	response
-// @Failure		500		{object}	response
-// @Failure		default	{object}	response
-// @Router			/posts/{id} [get]
+//	@Summary		Get Post By Id
+//	@Tags			posts
+//	@Description	get post by id
+//	@ID				get-post-by-id
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		string	true	"post id"
+//	@Success		200		{object}	dataResponse
+//	@Failure		400,404	{object}	response
+//	@Failure		500		{object}	response
+//	@Failure		default	{object}	response
+//	@Router			/posts/{id} [get]
 func (h *Handler) getPostById(c *gin.Context) {
 	postId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -71,18 +71,18 @@ func (h *Handler) getPostById(c *gin.Context) {
 	})
 }
 
-// @Summary		Get Post Comments
-// @Tags			posts
-// @Description	get post comments
-// @ID				get-post-comments
-// @Accept			json
-// @Produce		json
-// @Param			id		path		string	true	"post id"
-// @Success		200		{object}	dataResponse
-// @Failure		400,404	{object}	response
-// @Failure		500		{object}	response
-// @Failure		default	{object}	response
-// @Router			/posts/{id}/comments [get]
+//	@Summary		Get Post Comments
+//	@Tags			posts
+//	@Description	get post comments
+//	@ID				get-post-comments
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		string	true	"post id"
+//	@Success		200		{object}	dataResponse
+//	@Failure		400,404	{object}	response
+//	@Failure		500		{object}	response
+//	@Failure		default	{object}	response
+//	@Router			/posts/{id}/comments [get]
 func (h *Handler) getPostComments(c *gin.Context) {
 	postId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

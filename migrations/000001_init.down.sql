@@ -1,5 +1,7 @@
 DROP TABLE IF EXISTS users_posts;
 
+DROP TABLE IF EXISTS reports;
+
 DROP TABLE IF EXISTS comments;
 
 DROP TABLE IF EXISTS posts;

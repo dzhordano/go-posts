@@ -28,6 +28,13 @@ type Comment struct {
 	Censored bool      `json:"censored"`
 }
 
+type Report struct {
+	ID         uint      `json:"id"`
+	PostId     uint      `json:"post_id"`
+	UserId     uint      `json:"user_id"`
+	ReportedAt time.Time `json:"reported_at" db:"created"`
+}
+
 type UpdatePostInput struct {
 	Title       *string
 	Description *string

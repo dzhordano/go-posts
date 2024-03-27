@@ -166,3 +166,11 @@ func (r *AdminsRepo) DeleteComment(ctx context.Context, commId uint) error {
 
 	return err
 }
+
+func (r *AdminsRepo) DealReport(ctx context.Context, reportId uint) error {
+	query := fmt.Sprintf("DELETE FROM %s WHERE id = $1", reports_table)
+
+	_, err := r.db.Exec(ctx, query, reportId)
+
+	return err
+}

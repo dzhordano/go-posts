@@ -67,3 +67,11 @@ func (s *PostsService) Like(ctx context.Context, postId uint) error {
 func (s *PostsService) RemoveLike(ctx context.Context, postId uint) error {
 	return s.repo.RemoveLike(ctx, postId)
 }
+
+func (s *PostsService) Report(ctx context.Context, postId, userId uint) error {
+	return s.repo.Report(ctx, postId, userId)
+}
+
+func (s *PostsService) GetAllReports(ctx context.Context) ([]domain.Report, error) {
+	return s.repo.GetAllReports(ctx)
+}

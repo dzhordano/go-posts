@@ -179,3 +179,28 @@ func (r *PostsRepo) RemoveLike(ctx context.Context, postId uint) error {
 
 	return err
 }
+
+func (r *PostsRepo) Report(ctx context.Context, postId, userId uint) error {
+	query := fmt.Sprintf("INSERT INTO %s (post_id, user_id, created) VALUES ($1, $2, $3)", reports_table)
+
+	_, err := r.db.Exec(ctx, query, postId, userId, time.Now())
+
+	return err
+}
+
+func (r *PostsRepo) GetAllReports(ctx context.Context) ([]domain.Report, error) {
+	query := fmt.Sprintf("SELECT id, post_id, user_id, created FROM %s", reports_table)
+
+	var reports []domain.Report
+	rows, err := r.db.Query(ctx, query)
+	if err != nil {
+		return []domain.Report{}, err
+	}
+
+	reports, err = pgx.CollectRows(rows, pgx.RowToStructByName[domain.Report])
+	if err != nil {
+		return []domain.Report{}, err
+	}
+
+	return reports, err
+}

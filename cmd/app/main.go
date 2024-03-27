@@ -22,8 +22,6 @@ import (
 // configs dir path
 var cfgPath = "configs"
 
-// TODO: do more user tests. admin+posts+comments tests.
-
 //	@title			Go-Posts Api
 //	@version		1.0
 //	@description	...
@@ -34,9 +32,9 @@ var cfgPath = "configs"
 //	@in							header
 //	@name						Authorization
 
-// @securityDefinitions.apiKey	AdminAuth
-// @in							header
-// @name						Authorization
+//	@securityDefinitions.apiKey	AdminAuth
+//	@in							header
+//	@name						Authorization
 func main() {
 	// TODO: user this logger
 	slog.SetDefault(logger.InitLogger())

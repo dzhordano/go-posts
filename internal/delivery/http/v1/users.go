@@ -27,6 +27,7 @@ func (h *Handler) initUsersRoutes(api *gin.RouterGroup) {
 				posts.POST("/", h.createUserPost)
 				posts.PUT("/:id", h.updateUserPost)
 				posts.DELETE("/:id", h.deleteUserPost)
+				posts.POST("/:id/report", h.reportPost)
 
 				posts.GET("/:id/comments", h.getUserPostComments)
 				posts.POST("/:id/comment", h.createPostComment)
@@ -663,6 +664,45 @@ func (h *Handler) userRemoveLike(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response{
 		Message: "success",
+	})
+}
+
+//	@Summary		User Report Post
+//	@Security		UserAuth
+//	@Tags			users
+//	@Description	report a post to admins
+//	@ID				user-report-post
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		string	true	"post id"
+//	@Success		200		{object}	response
+//	@Failure		400,404	{object}	response
+//	@Failure		500		{object}	response
+//	@Failure		default	{object}	response
+//	@Router			/users/posts/{id}/report [post]
+func (h *Handler) reportPost(c *gin.Context) {
+	postId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newResponse(c, http.StatusBadRequest, err.Error())
+
+		return
+	}
+
+	userId, err := h.getUserId(c)
+	if err != nil {
+		newResponse(c, http.StatusBadRequest, err.Error())
+
+		return
+	}
+
+	if err := h.services.Posts.Report(c.Request.Context(), uint(postId), userId); err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+
+		return
+	}
+
+	c.JSON(http.StatusOK, response{
+		Message: "reported",
 	})
 }
 

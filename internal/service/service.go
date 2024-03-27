@@ -48,6 +48,8 @@ type (
 
 		CensorComment(ctx context.Context, commId uint) error
 		DeleteComment(ctx context.Context, commId uint) error
+		// TODO: mark as MARK report, not just delete. fix this in case arent lazy
+		DealReport(ctx context.Context, reportId uint) error
 	}
 
 	Posts interface {
@@ -62,6 +64,9 @@ type (
 		DeleteUser(ctx context.Context, postId, userId uint) error
 		Like(ctx context.Context, postId uint) error
 		RemoveLike(ctx context.Context, postId uint) error
+		// TODO: Move those to another REPORTS SERVICE
+		GetAllReports(ctx context.Context) ([]domain.Report, error)
+		Report(ctx context.Context, postId, userId uint) error
 	}
 
 	Comments interface {

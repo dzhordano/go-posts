@@ -345,6 +345,74 @@ paths:
       summary: Suspend Post
       tags:
       - admins
+  /admins/reports:
+    get:
+      consumes:
+      - application/json
+      description: get all available reports
+      operationId: admin-get-all-reports
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.dataResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Get Available Report
+      tags:
+      - admins
+  /admins/reports/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: deletes report by id
+      operationId: admin-deal-report
+      parameters:
+      - description: report id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Deal Report
+      tags:
+      - admins
   /admins/sign-in:
     post:
       consumes:
@@ -1195,6 +1263,46 @@ paths:
       security:
       - UserAuth: []
       summary: User Like Post
+      tags:
+      - users
+  /users/posts/{id}/report:
+    post:
+      consumes:
+      - application/json
+      description: report a post to admins
+      operationId: user-report-post
+      parameters:
+      - description: post id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/v1.response'
+      security:
+      - UserAuth: []
+      summary: User Report Post
       tags:
       - users
   /users/posts/{id}/unlike:

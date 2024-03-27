@@ -51,7 +51,6 @@ func (s *UsersService) SignUP(ctx context.Context, input UserSignUpInput) error 
 
 	verifyCode := s.otpGenerator.RandomSecret(s.verificationCodeLength)
 
-	// TODO: change verification data when implementing verification
 	user := domain.User{
 		Name:     input.Name,
 		Email:    input.Email,

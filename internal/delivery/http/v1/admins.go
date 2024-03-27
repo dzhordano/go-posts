@@ -48,6 +48,12 @@ func (h *Handler) initAdminsRoutes(api *gin.RouterGroup) {
 				comments.DELETE("/:id", h.adminDeleteComment)
 				comments.POST("/:id/censor", h.adminCensorComment)
 			}
+
+			reports := auth.Group("/reports")
+			{
+				reports.GET("/", h.getAvailableReports)
+				reports.DELETE("/:id", h.dealReport)
+			}
 		}
 	}
 }
@@ -526,4 +532,57 @@ func (h *Handler) adminCreateComment(c *gin.Context) {
 
 func (h *Handler) adminUpdateComment(c *gin.Context) {
 	panic("TODO")
+}
+
+//	@Summary		Get Available Report
+//	@Tags			admins
+//	@Description	get all available reports
+//	@ID				admin-get-all-reports
+//	@Accept			json
+//	@Produce		json
+//	@Success		200		{object}	dataResponse
+//	@Failure		400,404	{object}	response
+//	@Failure		500		{object}	response
+//	@Failure		default	{object}	response
+//	@Router			/admins/reports [get]
+func (h *Handler) getAvailableReports(c *gin.Context) {
+	reports, err := h.services.Posts.GetAllReports(c.Request.Context())
+	if err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+
+		return
+	}
+
+	c.JSON(http.StatusOK, dataResponse{
+		Data: reports,
+	})
+}
+
+//	@Summary		Deal Report
+//	@Tags			admins
+//	@Description	deletes report by id
+//	@ID				admin-deal-report
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path	string	true	"report id"
+//	@Success		200
+//	@Failure		400,404	{object}	response
+//	@Failure		500		{object}	response
+//	@Failure		default	{object}	response
+//	@Router			/admins/reports/{id} [delete]
+func (h *Handler) dealReport(c *gin.Context) {
+	reportId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newResponse(c, http.StatusBadRequest, err.Error())
+
+		return
+	}
+
+	if err := h.services.Admins.DealReport(c.Request.Context(), uint(reportId)); err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+
+		return
+	}
+
+	c.Status(http.StatusOK)
 }
